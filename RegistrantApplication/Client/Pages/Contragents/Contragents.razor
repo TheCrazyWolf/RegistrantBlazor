@@ -1,0 +1,65 @@
+﻿@page "/app/contragents"
+@inject HttpClient Http
+
+@using RegistrantApplication.Shared.Contragents;
+@using System.Reflection;
+
+<h1>Контрагенты</h1>
+
+
+<button type="button" class="btn btn-primary">Новый контрагент</button>
+
+
+<div class="modal-dialog modal-dialog-centered">
+    ...
+</div>
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Идентификатор</th>
+            <th scope="col">Название контрагента</th>
+            <th scope="col">Дата создания</th>
+            <th scope="col">Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (ListContragents == null)
+        {
+            <tr>
+                <th>Загрузка</th>
+                <th>Загрузка</th>
+                <th>Загрузка</th>
+                <th>Загрузка</th>
+            </tr>
+        }else
+        {
+            foreach (var item in ListContragents)
+            {
+                <tr>
+                    <th>@item.IdContragent</th>
+                    <th>@item.Title</th>
+                    <th>@item.DateTimeCreated</th>
+                    <th><input type="checkbox"/></th>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+@if (ListContragents == null)
+{
+    <img height="45" src="res/AppLoad.gif" alt="Ops" />
+}
+
+@code {
+    public List<Contragent> ListContragents;
+    private Module modal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListContragents = await Http.GetFromJsonAsync<List<Contragent>>("Contragents/Get");
+    }
+}

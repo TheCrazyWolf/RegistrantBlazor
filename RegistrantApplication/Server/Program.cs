@@ -1,3 +1,4 @@
+using Blazored.Modal;
 using Microsoft.AspNetCore.ResponseCompression;
 using RegistrantApplication.Server.Database;
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<LiteContext>();
+builder.Services.AddBlazoredModal();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

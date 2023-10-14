@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.Contragents;
 
 namespace RegistrantApplication.Server.Controllers
@@ -13,10 +14,37 @@ namespace RegistrantApplication.Server.Controllers
         }
 
         [HttpGet("Get")]
-        public IActionResult Get()
+        public IActionResult Get(string? search, int page, bool showDeleted)
         {
-            var data = _ef.Contragents.Where(x=> x.IsDeleted == false).ToList();
-            return Ok(data);
+            if (page < 0 )
+                return BadRequest("Страница отрицательная");
+
+            const int recordsByPage = 10;
+
+            long totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
+
+            long totalPages = totalRecords / recordsByPage;
+
+            if (page > totalPages)
+                return BadRequest("Страница за пределами количество страниц)");
+
+            var data = _ef.Contragents
+                .OrderBy(x => x.IdContragent)
+                .Where(x=> x.IsDeleted == showDeleted)
+                .Skip(page * recordsByPage)
+                .Take(recordsByPage)
+                .ToList();
+
+            ViewContragents view = new ViewContragents()
+            {
+                TotalRecords = totalRecords,
+                TotalPages = totalPages,
+                CurrentPage = page,
+                Contragents = data,
+                MaxRecordsOnPageConst = recordsByPage
+            };
+
+            return Ok(view);
         }
         
         [HttpPost("Create")]

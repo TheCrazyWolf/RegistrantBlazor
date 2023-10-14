@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>RegistrantApplication</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!--<link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />-->
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="RegistrantApplication.Client.styles.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
@@ -17,7 +18,7 @@
 
 <body>
     <div id="app">
-        
+
         <div style="display: flex; flex-direction:column; justify-content: center; align-items: center; height: 100vh;">
             <img height="45" src="res/AppLoad.gif" alt="Ops" />
             <br />
@@ -26,11 +27,11 @@
 
     </div>
 
-    <div id="blazor-error-ui">
+    <!--<div id="blazor-error-ui">
         В приложении произошла необработанная ошибка..
         <a href="" class="reload">Перезагрузить</a>
         <a class="dismiss">🗙</a>
-    </div>
+    </div>-->
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 </body>

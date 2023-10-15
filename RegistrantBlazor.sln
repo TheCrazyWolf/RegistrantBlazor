@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistrantApplication.Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistrantApplication.Shared", "RegistrantApplication\Shared\RegistrantApplication.Shared.csproj", "{4625AE54-B060-448D-B43B-23C89E8E5BEA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrantApplication.ApiLibrary", "RegistrantApplication.ApiLibrary\RegistrantApplication.ApiLibrary.csproj", "{C09D74CB-C13E-478E-9CBC-E98238B602CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4625AE54-B060-448D-B43B-23C89E8E5BEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4625AE54-B060-448D-B43B-23C89E8E5BEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4625AE54-B060-448D-B43B-23C89E8E5BEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C09D74CB-C13E-478E-9CBC-E98238B602CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C09D74CB-C13E-478E-9CBC-E98238B602CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C09D74CB-C13E-478E-9CBC-E98238B602CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C09D74CB-C13E-478E-9CBC-E98238B602CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

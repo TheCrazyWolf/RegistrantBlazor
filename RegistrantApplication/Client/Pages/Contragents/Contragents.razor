@@ -1,38 +1,68 @@
 ﻿@page "/contragents"
-@inject HttpClient Http
+@inject RApi api
 
+@using Newtonsoft.Json;
+@using RegistrantApplication.ApiLibrary;
 @using RegistrantApplication.Client.Pages.Contragents.Modals;
 @using RegistrantApplication.Shared.API;
 @using RegistrantApplication.Shared.Contragents;
+@using RestSharp;
 
 
-<button @onclick="() => ModelCreate.Open()" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Добавить контрагента</button>
-<ModalCreate @ref="ModelCreate" />
+<ModalCreate @ref="ModalCreate" />
+<ModalEdit @ref="ModalEdit"/>
+<ModalRemove @ref="ModalRemove" />
 
-<h1>@Page</h1>
+<div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+
+    <div class="relative rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600">
+        <label class="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-xs font-medium text-gray-900">Поиск</label>
+        <input type="text" @bind-value="SearchTitle" class="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Название контрагента">
+    </div>
+    <div class="relative flex items-start">
+        <div class="flex h-5 items-center">
+            <input @bind-value="ShowDeleted" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+        </div>
+        <div class="ml-3 text-sm">
+            <label class="font-medium text-gray-700">Удаленные</label>
+        </div>
+    </div>
+
+    <button @onclick="OnInitializedAsync" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Поиск</button>
+    <button @onclick="OpenModalAdd" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Добавить</button>
+    
+    @if(SelectedContragents.Count != 0 && ShowDeleted == false)
+    {
+        <button @onclick="() => ModalRemove.OpenModalForDelete(SelectedContragents)" class="inline-flex items-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Удалить выбранные</button>
+    }
+
+</div>
+
 <div class="mt-0 flex flex-col">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead>
                     <tr>
+                        <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"></th>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">Идентификатор</th>
                         <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Название контрагента</th>
                         <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Дата создания</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 md:pr-0">
-                            <span class="sr-only">Edit</span>
+                            <span class="sr-only">Действия</span>
                         </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
 
-                    @if (ViewData.Contragents == null)
+                    @if (ViewData.Contragents == null || ViewData.TotalRecords == 0 )
                     {
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">Загрузка</td>
-                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Загрузка</td>
-                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Загрузка</td>
-                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Загрузка</td>
+                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0"></td>
+                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Нет данных для просмотра</td>
+                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
+                            <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
                         </tr>
                     }
                     else
@@ -40,14 +70,32 @@
                         foreach (var item in ViewData.Contragents)
                         {
                             <tr>
+
+                                @if(SelectedContragents.Any(x=> x.IdContragent == item.IdContragent))
+                                {
+                                    <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
+                                        <input checked="checked" @onchange="eventArgs => Selected(item, eventArgs)"
+                                               type="checkbox"
+                                               class="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all
+                                            before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-pink-500 checked:bg-pink-500 checked:before:bg-pink-500 hover:before:opacity-10" />
+                                    </td>
+                                }else
+                                {
+                                    <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
+                                        <input @onchange="eventArgs => Selected(item, eventArgs)"
+                                               type="checkbox"
+                                               class="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all
+                                            before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-pink-500 checked:bg-pink-500 checked:before:bg-pink-500 hover:before:opacity-10" />
+                                    </td>
+                                }
+
                                 <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.IdContragent</td>
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">@item.Title</td>
                                 <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.DateTimeCreated</td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 md:pr-0">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, Lindsay Walton</span></a>
+                                    <a @onclick="() => ModalEdit.OpenModalForEdit(item)" class="cursor-pointer text-indigo-600 hover:text-indigo-900">Редактировать</a>
                                 </td>
                             </tr>
-
                         }
                     }
 
@@ -69,18 +117,28 @@
         </p>
     </div>
     <div class="flex flex-1 justify-between sm:justify-end">
-        <a @onclick="BackPage" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Предыдущая</a>
-        <a @onclick="NextPage" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Следующая</a>
+        <a @onclick="BackPage" class="cursor-pointer relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Предыдущая</a>
+        <a @onclick="NextPage" class="cursor-pointer relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Следующая</a>
     </div>
 </nav>
 
+
+
 @code {
+
+    [Parameter][SupplyParameterFromQuery] public string? SearchTitle { get; set; }
     [Parameter][SupplyParameterFromQuery] public int Page { get; set; }
     [Parameter][SupplyParameterFromQuery] public bool ShowDeleted { get; set; }
 
-    public ViewContragents ViewData;
+    /* Ответ из API */
+    public ViewContragents ViewData { get; set; } = new ViewContragents() { Contragents = new List<Contragent>()};
 
-    public ModalCreate ModelCreate { get; set; } = new ModalCreate();
+    /* Выбранные контрагенты */
+    public List<Contragent> SelectedContragents { get; set; } = new List<Contragent>();
+
+    public ModalCreate ModalCreate { get; set; } = new ModalCreate();
+    public ModalEdit ModalEdit { get; set; } = new ModalEdit();
+    public ModalRemove ModalRemove { get; set; } = new ModalRemove();
 
 
     protected override async Task OnInitializedAsync()
@@ -88,22 +146,51 @@
         ViewData = await DoRequest();
     }
 
+
+    public async void OpenModalAdd()
+    {
+        var result = await ModalCreate.OpenModalForCreate();
+        await OnInitializedAsync();
+    }
+
+    public void Selected(Contragent contragent, ChangeEventArgs eventArgs)
+    {
+        if ((bool)eventArgs.Value)
+            SelectedContragents.Add(contragent);
+        else
+            SelectedContragents.Remove(contragent);
+    }
+
     public async void NextPage()
     {
+        if(Page + 1 > ViewData.TotalPages)
+            return;
+
         Page++;
         ViewData = await DoRequest();
-        StateHasChanged();
+
     }
 
     public async void BackPage()
     {
+        if (Page - 1 < 0)
+            return;
+
         Page--;
         ViewData = await DoRequest();
-        StateHasChanged();
+
     }
 
     public async Task<ViewContragents> DoRequest()
     {
-        return await Http.GetFromJsonAsync<ViewContragents>($"Contragents/Get?page={Page}&showDeleted={ShowDeleted}");
+        RestResponse result = await api.Contragents.Get(searchTitle: SearchTitle, pageNumber: Page, showDeleted: ShowDeleted);
+        if(result.IsSuccessStatusCode)
+            return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
+        else
+        {
+            Page = 0;
+            result = await api.Contragents.Get(searchTitle: SearchTitle, pageNumber: Page, showDeleted: ShowDeleted);
+            return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
+        }
     }
 }

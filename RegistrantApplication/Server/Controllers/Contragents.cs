@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.Contragents;
+using System.Linq;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -14,12 +16,12 @@ namespace RegistrantApplication.Server.Controllers
         }
 
         [HttpGet("Get")]
-        public IActionResult Get(string? search, int page, bool showDeleted)
+        public IActionResult Get(string? search, long page, bool showDeleted)
         {
             if (page < 0 )
                 return BadRequest("Страница отрицательная");
 
-            const int recordsByPage = 10;
+            const long recordsByPage = 10;
 
             long totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
 
@@ -27,13 +29,31 @@ namespace RegistrantApplication.Server.Controllers
 
             if (page > totalPages)
                 return BadRequest("Страница за пределами количество страниц)");
+            
+            List<Contragent> data;
 
-            var data = _ef.Contragents
-                .OrderBy(x => x.IdContragent)
-                .Where(x=> x.IsDeleted == showDeleted)
-                .Skip(page * recordsByPage)
-                .Take(recordsByPage)
-                .ToList();
+            if (string.IsNullOrEmpty(search))
+            {
+               data = _ef.Contragents
+                    .OrderBy(x => x.IdContragent)
+                    .Where(x => x.IsDeleted == showDeleted)
+                    .Skip((int)(page * recordsByPage))
+                    .Take((int)recordsByPage)
+                    .ToList();
+                totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
+            }
+            else
+            {
+                data = _ef.Contragents
+                    .OrderBy(x => x.IdContragent)
+                    .Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper()))
+                    .Skip((int)(page * recordsByPage))
+                    .Take((int)recordsByPage)
+                    .ToList();
+
+                totalRecords = _ef.Contragents.Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper())).Count();
+                totalPages = totalRecords / recordsByPage;
+            }
 
             ViewContragents view = new ViewContragents()
             {
@@ -50,7 +70,14 @@ namespace RegistrantApplication.Server.Controllers
         [HttpPost("Create")]
         public IActionResult Create([FromBody] Contragent contragent)
         {
+            if (string.IsNullOrEmpty(contragent.Title))
+                return BadRequest("Название контрагента не может быть пустым");
+
+            if (_ef.Contragents.Any(x => x.Title.ToUpper() == contragent.Title.ToUpper() && x.IsDeleted == false))
+                return BadRequest("Такой контрагент уже существует");
+            
             contragent.DateTimeCreated = DateTime.Now;
+            contragent.Title = contragent.Title.ToUpper();
             _ef.Add(contragent);
             _ef.SaveChanges();
             return Ok();
@@ -63,18 +90,22 @@ namespace RegistrantApplication.Server.Controllers
                 .FirstOrDefault(x=> x.IdContragent == contragent.IdContragent);
 
             if (found == null)
-                return NotFound("Db not found");
+                return NotFound("Элемент не найден");
 
-            found.Title = contragent.Title;
+            if (string.IsNullOrEmpty(contragent.Title))
+                return BadRequest("Новое имя агента не должно быть пустым");
+
+            found.Title = contragent.Title.ToUpper();
+            found.IsDeleted = contragent.IsDeleted;
             _ef.Update(found);
             _ef.SaveChanges();
             return Ok();
         }
 
         [HttpDelete("Delete")]
-        public IActionResult Delete([FromBody] long[] ids) 
+        public IActionResult Delete([FromBody] long[] idsContragents) 
         {
-            foreach (var item in ids)
+            foreach (var item in idsContragents)
             {
                 var found = _ef.Contragents.FirstOrDefault(x => x.IdContragent == item);
                 if (found == null)

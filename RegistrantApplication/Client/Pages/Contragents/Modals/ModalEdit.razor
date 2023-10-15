@@ -16,7 +16,7 @@
             From: "opacity-100"
             To: "opacity-0"
         -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-md"></div>
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity @PropertyBlur"></div>
 
         <EditForm Model="Contragent" OnSubmit="Sumbit">
             <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -91,14 +91,17 @@
             CloseAsync();
         else
             ErrorMessageContent = result.Content;
+        StateHasChanged();
     }
 
-    public void OpenModalForEdit(Contragent contragent)
+    public async Task<bool> Show(Contragent contragent)
     {
         Contragent = contragent;
         ErrorMessageContent = null;
 
         IdModal = Guid.NewGuid().ToString();
         ShowAsync();
+        
+        return await Task.Run(WaitForResult);
     }
 }

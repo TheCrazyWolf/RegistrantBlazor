@@ -19,7 +19,7 @@
         <label class="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-xs font-medium text-gray-900">Поиск</label>
         <input type="text" @bind-value="SearchTitle" class="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Название контрагента">
     </div>
-    <div class="relative flex items-start">
+    <div class="relative flex items-center">
         <div class="flex h-5 items-center">
             <input @bind-value="ShowDeleted" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
         </div>
@@ -33,7 +33,7 @@
     
     @if(SelectedContragents.Count != 0 && ShowDeleted == false)
     {
-        <button @onclick="() => ModalRemove.OpenModalForDelete(SelectedContragents)" class="inline-flex items-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Удалить выбранные</button>
+        <button @onclick="OpenModalDelete" class="inline-flex items-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Удалить выбранные</button>
     }
 
 </div>
@@ -93,7 +93,7 @@
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">@item.Title</td>
                                 <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.DateTimeCreated</td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 md:pr-0">
-                                    <a @onclick="() => ModalEdit.OpenModalForEdit(item)" class="cursor-pointer text-indigo-600 hover:text-indigo-900">Редактировать</a>
+                                    <a @onclick="eventArgs => OpenModalEdit(eventArgs, item)" class="cursor-pointer text-indigo-600 hover:text-indigo-900">Редактировать</a>
                                 </td>
                             </tr>
                         }
@@ -149,8 +149,23 @@
 
     public async void OpenModalAdd()
     {
-        var result = await ModalCreate.OpenModalForCreate();
+        var result = await ModalCreate.Show();  
         await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    public async void OpenModalEdit(MouseEventArgs events, Contragent contragent)
+    {
+        var result = await ModalEdit.Show(contragent);
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    public async void OpenModalDelete()
+    {
+        var result = await ModalRemove.Show(SelectedContragents);
+        await OnInitializedAsync();
+        StateHasChanged();
     }
 
     public void Selected(Contragent contragent, ChangeEventArgs eventArgs)
@@ -168,7 +183,7 @@
 
         Page++;
         ViewData = await DoRequest();
-
+        StateHasChanged();
     }
 
     public async void BackPage()
@@ -179,6 +194,7 @@
         Page--;
         ViewData = await DoRequest();
 
+        StateHasChanged();
     }
 
     public async Task<ViewContragents> DoRequest()

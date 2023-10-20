@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.Drivers;
@@ -11,6 +12,22 @@ namespace RegistrantApplication.Server.Controllers
         {
         }
 
+
+        [HttpGet("GetById")]
+        public IActionResult GetById(long idDriver)
+        {
+
+            var currentDriver = _ef.Drivers
+                .Include(x => x.Documents)
+                .Include(x => x.Autos)
+                .FirstOrDefault(x => x.IdDriver == idDriver);
+
+            if (currentDriver == null)
+                return NotFound("Водитель не найден");
+
+            return Ok(currentDriver);
+        }
+        
         [HttpGet("Get")]
         public IActionResult Get(string? search, long page, bool showDeleted)
         {

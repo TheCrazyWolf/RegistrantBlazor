@@ -17,37 +17,6 @@ namespace RegistrantApplication.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
 
-            modelBuilder.Entity("RegistrantApplication.Shared.Accounts.Account", b =>
-                {
-                    b.Property<long>("IdAccount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Family")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Patronymic")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("IdAccount");
-
-                    b.ToTable("Accounts");
-                });
-
             modelBuilder.Entity("RegistrantApplication.Shared.Contragents.Contragent", b =>
                 {
                     b.Property<long>("IdContragent")
@@ -69,18 +38,52 @@ namespace RegistrantApplication.Server.Migrations
                     b.ToTable("Contragents");
                 });
 
+            modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Account", b =>
+                {
+                    b.Property<long>("IdAccount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Family")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDriver")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdAccount");
+
+                    b.ToTable("Accounts");
+                });
+
             modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Auto", b =>
                 {
                     b.Property<long>("IdAuto")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<long?>("AccountIdAccount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("AutoNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<long?>("DriverIdDriver")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -88,7 +91,7 @@ namespace RegistrantApplication.Server.Migrations
 
                     b.HasKey("IdAuto");
 
-                    b.HasIndex("DriverIdDriver");
+                    b.HasIndex("AccountIdAccount");
 
                     b.ToTable("Autos");
                 });
@@ -106,9 +109,6 @@ namespace RegistrantApplication.Server.Migrations
                         .IsRequired()
                         .HasColumnType("BLOB");
 
-                    b.Property<long?>("DriverIdDriver")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -121,43 +121,16 @@ namespace RegistrantApplication.Server.Migrations
 
                     b.HasIndex("AccountIdAccount");
 
-                    b.HasIndex("DriverIdDriver");
-
                     b.ToTable("Documents");
-                });
-
-            modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Driver", b =>
-                {
-                    b.Property<long>("IdDriver")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Family")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Patronymic")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("IdDriver");
-
-                    b.ToTable("Drivers");
                 });
 
             modelBuilder.Entity("RegistrantApplication.Shared.Orders.Order", b =>
                 {
                     b.Property<long>("IdOrder")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("AccountIdAccount")
                         .HasColumnType("INTEGER");
 
                     b.Property<long?>("AutoIdAuto")
@@ -187,16 +160,18 @@ namespace RegistrantApplication.Server.Migrations
                     b.Property<DateTime?>("DateTimeStartOrder")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("DriverIdDriver")
+                    b.Property<long>("OrderDetailsIdOrderDetails")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("IdOrder");
+
+                    b.HasIndex("AccountIdAccount");
 
                     b.HasIndex("AutoIdAuto");
 
                     b.HasIndex("ContragentIdContragent");
 
-                    b.HasIndex("DriverIdDriver");
+                    b.HasIndex("OrderDetailsIdOrderDetails");
 
                     b.ToTable("Orders");
                 });
@@ -255,27 +230,27 @@ namespace RegistrantApplication.Server.Migrations
 
             modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Auto", b =>
                 {
-                    b.HasOne("RegistrantApplication.Shared.Drivers.Driver", null)
+                    b.HasOne("RegistrantApplication.Shared.Drivers.Account", null)
                         .WithMany("Autos")
-                        .HasForeignKey("DriverIdDriver")
+                        .HasForeignKey("AccountIdAccount")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Document", b =>
                 {
-                    b.HasOne("RegistrantApplication.Shared.Accounts.Account", null)
+                    b.HasOne("RegistrantApplication.Shared.Drivers.Account", null)
                         .WithMany("Documents")
                         .HasForeignKey("AccountIdAccount")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("RegistrantApplication.Shared.Drivers.Driver", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("DriverIdDriver")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("RegistrantApplication.Shared.Orders.Order", b =>
                 {
+                    b.HasOne("RegistrantApplication.Shared.Drivers.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountIdAccount")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("RegistrantApplication.Shared.Drivers.Auto", "Auto")
                         .WithMany()
                         .HasForeignKey("AutoIdAuto")
@@ -286,21 +261,24 @@ namespace RegistrantApplication.Server.Migrations
                         .HasForeignKey("ContragentIdContragent")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("RegistrantApplication.Shared.Drivers.Driver", "Driver")
+                    b.HasOne("RegistrantApplication.Shared.Orders.OrderDetails", "OrderDetails")
                         .WithMany()
-                        .HasForeignKey("DriverIdDriver")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("OrderDetailsIdOrderDetails")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
 
                     b.Navigation("Auto");
 
                     b.Navigation("Contragent");
 
-                    b.Navigation("Driver");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("RegistrantApplication.Shared.Orders.OrderDetails", b =>
                 {
-                    b.HasOne("RegistrantApplication.Shared.Accounts.Account", "StoreKeeper")
+                    b.HasOne("RegistrantApplication.Shared.Drivers.Account", "StoreKeeper")
                         .WithMany()
                         .HasForeignKey("StoreKeeperIdAccount")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -308,12 +286,7 @@ namespace RegistrantApplication.Server.Migrations
                     b.Navigation("StoreKeeper");
                 });
 
-            modelBuilder.Entity("RegistrantApplication.Shared.Accounts.Account", b =>
-                {
-                    b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Driver", b =>
+            modelBuilder.Entity("RegistrantApplication.Shared.Drivers.Account", b =>
                 {
                     b.Navigation("Autos");
 

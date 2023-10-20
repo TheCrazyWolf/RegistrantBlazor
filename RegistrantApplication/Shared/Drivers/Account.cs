@@ -1,7 +1,6 @@
-﻿using RegistrantApplication.Shared.Drivers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RegistrantApplication.Shared.Accounts
+namespace RegistrantApplication.Shared.Drivers
 {
     public class Account
     {
@@ -10,10 +9,11 @@ namespace RegistrantApplication.Shared.Accounts
         public string Family { get; set; }
         public string Name { get; set; }
         public string? Patronymic { get; set; }
-        public string? PhoneNumber { get; set; }
         public string? PasswordHash { get; set; }
+        public string? PhoneNumber { get; set; }
+        public List<Auto>? Autos { get; set; }
         public List<Document>? Documents { get; set; }
-
+        public bool IsDriver { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using RegistrantApplication.Shared.Accounts;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Shared.Orders
 {

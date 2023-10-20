@@ -17,10 +17,10 @@ namespace RegistrantApplication.Server.Controllers
         public IActionResult GetById(long idDriver)
         {
 
-            var currentDriver = _ef.Drivers
+            var currentDriver = _ef.Accounts
                 .Include(x => x.Documents)
                 .Include(x => x.Autos)
-                .FirstOrDefault(x => x.IdDriver == idDriver);
+                .FirstOrDefault(x => x.IdAccount == idDriver);
 
             if (currentDriver == null)
                 return NotFound("Водитель не найден");
@@ -44,12 +44,12 @@ namespace RegistrantApplication.Server.Controllers
             if (page > totalPages)
                 return BadRequest("Страница за пределами количество страниц)");
 
-            List<Driver> data;
+            List<Account> data;
 
             if (string.IsNullOrEmpty(search))
             {
-                data = _ef.Drivers
-                     .OrderBy(x => x.IdDriver)
+                data = _ef.Accounts
+                     .OrderBy(x => x.IdAccount)
                      .Where(x => x.IsDeleted == showDeleted)
                      .Skip((int)(page * recordsByPage))
                      .Take((int)recordsByPage)
@@ -58,8 +58,8 @@ namespace RegistrantApplication.Server.Controllers
             }
             else
             {
-                data = _ef.Drivers
-                    .OrderBy(x => x.IdDriver)
+                data = _ef.Accounts
+                    .OrderBy(x => x.IdAccount)
                     .Where(x => (x.IsDeleted == showDeleted) && x.Family.ToUpper().Contains(search.ToUpper()))
                     .Skip((int)(page * recordsByPage))
                     .Take((int)recordsByPage)
@@ -74,7 +74,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Drivers = data,
+                Accounts = data,
                 MaxRecordsOnPageConst = recordsByPage
             };
 

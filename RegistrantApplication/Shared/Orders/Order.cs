@@ -9,7 +9,7 @@ namespace RegistrantApplication.Shared.Orders
         [Key]
         public long IdOrder { get; set; }
         public Contragent? Contragent { get; set; }
-        public Driver? Driver { get; set; }
+        public Account? Account { get; set; }
         public Auto? Auto { get; set; }
 
         public DateTime DateTimeCreatedOrder { get; set; }
@@ -19,5 +19,7 @@ namespace RegistrantApplication.Shared.Orders
         public DateTime? DateTimeStartOrder { get; set; }
         public DateTime? DateTimeEndOrder { get; set; }
         public DateTime? DateTimeLeft { get; set; }
+        
+        public OrderDetails OrderDetails { get; set; }
     }
 }

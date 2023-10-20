@@ -1,5 +1,9 @@
 ﻿@page "/drivers"
 @using RegistrantApplication.Shared.Drivers;
+@using RegistrantApplication.ApiLibrary
+@using RegistrantApplication.Shared.API
+@using Newtonsoft.Json
+@inject RApi Api;
 
 <PageTitle>Водители</PageTitle>
 
@@ -31,8 +35,31 @@
 
 @code {
 
-    [Parameter] [SupplyParameterFromQuery] public string Search { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public string? Search { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public int Page { get; set; }
     [Parameter] [SupplyParameterFromQuery] public bool ShowDeleted { get; set; } = false;
+    
+    public ViewDrivers? ViewData { get; set; } = new ViewDrivers();
 
-    public List<Driver> SelectedDrivers { get; set; } = new List<Driver>();
+    public List<Driver>? SelectedDrivers { get; set; } = new List<Driver>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ViewData = await DoRequestAsync();
+        StateHasChanged();
+    }
+
+    public async Task<ViewDrivers> DoRequestAsync()
+    {
+        var result = await Api.Drivers.Get(searchTitle: Search, page: Page, showDeleted: ShowDeleted);
+        if(result.IsSuccessStatusCode)
+            return JsonConvert.DeserializeObject<ViewDrivers>(result.Content);
+        else
+        {
+            Page = 0;
+            result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
+            return JsonConvert.DeserializeObject<ViewDrivers>(result.Content);
+        }
+    }
+
 }

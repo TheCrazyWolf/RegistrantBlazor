@@ -1,5 +1,5 @@
 ﻿@page "/contragents"
-@inject RApi api
+@inject RApi Api
 
 @using Newtonsoft.Json;
 @using RegistrantApplication.ApiLibrary;
@@ -17,23 +17,23 @@
 
     <div class="relative rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600">
         <label class="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-xs font-medium text-gray-900">Поиск</label>
-        <input type="text" @bind-value="SearchTitle" class="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Название контрагента">
+        <input type="text" @bind-value="Search" class="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Название контрагента">
     </div>
     <div class="relative flex items-center">
         <div class="flex h-5 items-center">
-            <input @bind-value="ShowDeleted" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+            <input @bind-value="ShowDeleted" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 ">
         </div>
         <div class="ml-3 text-sm">
             <label class="font-medium text-gray-700">Удаленные</label>
         </div>
     </div>
 
-    <button @onclick="OnInitializedAsync" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Поиск</button>
-    <button @onclick="OpenModalAdd" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Добавить</button>
+    <button @onclick="OnInitializedAsync" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 ">Поиск</button>
+    <button @onclick="OpenModalAdd" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 ">Добавить</button>
     
     @if(SelectedContragents.Count != 0 && ShowDeleted == false)
     {
-        <button @onclick="OpenModalDelete" class="inline-flex items-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Удалить выбранные</button>
+        <button @onclick="OpenModalDelete" class="inline-flex items-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-red-700">Удалить выбранные</button>
     }
 
 </div>
@@ -45,7 +45,7 @@
                 <thead>
                     <tr>
                         <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"></th>
-                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">Идентификатор</th>
+                        @*<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">Идентификатор</th>*@
                         <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Название контрагента</th>
                         <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Дата создания</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 md:pr-0">
@@ -59,7 +59,7 @@
                     {
                         <tr>
                             <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
-                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0"></td>
+                            @*<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0"></td>*@
                             <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Нет данных для просмотра</td>
                             <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
                             <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
@@ -89,8 +89,8 @@
                                     </td>
                                 }
 
-                                <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.IdContragent</td>
-                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">@item.Title</td>
+                                @*<td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.IdContragent</td>*@
+                                <td class="whitespace-nowrap py-4 px-3 text-sm ">@item.Title</td>
                                 <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.DateTimeCreated</td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 md:pr-0">
                                     <a @onclick="eventArgs => OpenModalEdit(eventArgs, item)" class="cursor-pointer text-indigo-600 hover:text-indigo-900">Редактировать</a>
@@ -126,42 +126,42 @@
 
 @code {
 
-    [Parameter][SupplyParameterFromQuery] public string? SearchTitle { get; set; }
+    [Parameter][SupplyParameterFromQuery] public string? Search { get; set; }
     [Parameter][SupplyParameterFromQuery] public int Page { get; set; }
     [Parameter][SupplyParameterFromQuery] public bool ShowDeleted { get; set; }
 
     /* Ответ из API */
-    public ViewContragents ViewData { get; set; } = new ViewContragents() { Contragents = new List<Contragent>()};
+    protected ViewContragents ViewData { get; set; } = new ViewContragents() { Contragents = new List<Contragent>()};
 
     /* Выбранные контрагенты */
-    public List<Contragent> SelectedContragents { get; set; } = new List<Contragent>();
+    protected List<Contragent> SelectedContragents { get; set; } = new List<Contragent>();
 
-    public ModalCreate ModalCreate { get; set; } = new ModalCreate();
-    public ModalEdit ModalEdit { get; set; } = new ModalEdit();
-    public ModalRemove ModalRemove { get; set; } = new ModalRemove();
+    protected ModalCreate ModalCreate { get; set; } = new ModalCreate();
+    protected ModalEdit ModalEdit { get; set; } = new ModalEdit();
+    protected ModalRemove ModalRemove { get; set; } = new ModalRemove();
 
 
     protected override async Task OnInitializedAsync()
     {
-        ViewData = await DoRequest();
+        ViewData = await DoRequestAsync();
     }
 
 
-    public async void OpenModalAdd()
+    protected async void OpenModalAdd()
     {
         var result = await ModalCreate.Show();  
         await OnInitializedAsync();
         StateHasChanged();
     }
 
-    public async void OpenModalEdit(MouseEventArgs events, Contragent contragent)
+    protected async void OpenModalEdit(MouseEventArgs events, Contragent contragent)
     {
         var result = await ModalEdit.Show(contragent);
         await OnInitializedAsync();
         StateHasChanged();
     }
 
-    public async void OpenModalDelete()
+    protected async void OpenModalDelete()
     {
         var result = await ModalRemove.Show(SelectedContragents);
         await OnInitializedAsync();
@@ -169,7 +169,7 @@
         StateHasChanged();
     }
 
-    public void Selected(Contragent contragent, ChangeEventArgs eventArgs)
+    protected void Selected(Contragent contragent, ChangeEventArgs eventArgs)
     {
         if ((bool)eventArgs.Value)
             SelectedContragents.Add(contragent);
@@ -177,36 +177,36 @@
             SelectedContragents.Remove(contragent);
     }
 
-    public async void NextPage()
+    protected async void NextPage()
     {
         if(Page + 1 > ViewData.TotalPages)
             return;
 
         Page++;
-        ViewData = await DoRequest();
+        ViewData = await DoRequestAsync();
         StateHasChanged();
     }
 
-    public async void BackPage()
+    protected async void BackPage()
     {
         if (Page - 1 < 0)
             return;
 
         Page--;
-        ViewData = await DoRequest();
+        ViewData = await DoRequestAsync();
 
         StateHasChanged();
     }
 
-    public async Task<ViewContragents> DoRequest()
+    protected async Task<ViewContragents> DoRequestAsync()
     {
-        RestResponse result = await api.Contragents.Get(searchTitle: SearchTitle, pageNumber: Page, showDeleted: ShowDeleted);
+        RestResponse result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
         if(result.IsSuccessStatusCode)
             return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
         else
         {
             Page = 0;
-            result = await api.Contragents.Get(searchTitle: SearchTitle, pageNumber: Page, showDeleted: ShowDeleted);
+            result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
             return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
         }
     }

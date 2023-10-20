@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
-using RegistrantApplication.Shared.Contragents;
 using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.Contragents;
-using System.Linq;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -35,7 +33,7 @@ namespace RegistrantApplication.Server.Controllers
             if (string.IsNullOrEmpty(search))
             {
                data = _ef.Contragents
-                    .OrderBy(x => x.IdContragent)
+                    .OrderBy(x => x.Title)
                     .Where(x => x.IsDeleted == showDeleted)
                     .Skip((int)(page * recordsByPage))
                     .Take((int)recordsByPage)
@@ -45,7 +43,7 @@ namespace RegistrantApplication.Server.Controllers
             else
             {
                 data = _ef.Contragents
-                    .OrderBy(x => x.IdContragent)
+                    .OrderBy(x => x.Title)
                     .Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper()))
                     .Skip((int)(page * recordsByPage))
                     .Take((int)recordsByPage)

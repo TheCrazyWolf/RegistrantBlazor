@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>RegistrantApplication</title>
-    <base href="/" />
-    
+    <base href="/"/>
+
     <!-- TAIWLWIND CSS -->
     <link rel="stylesheet" href="tailwind/components.css">
     <script src="tailwind/components.js"></script>
@@ -14,32 +14,43 @@
     <!--
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     -->
-    
-    <link href="css/app.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="RegistrantApplication.Client.styles.css" rel="stylesheet" />
-    <link href="manifest.json" rel="manifest" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+
+    <link href="css/app.css" rel="stylesheet"/>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link href="RegistrantApplication.Client.styles.css" rel="stylesheet"/>
+    <link href="manifest.json" rel="manifest"/>
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png"/>
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png"/>
 </head>
 <body>
-    <div id="app">
-        <div class="appLoad">
-            <div class="profile-main-loader">
-                <div class="loader">
-                    <svg class="circular-loader"viewBox="25 25 50 50" >
-                        <circle class="loader-path" cx="50" cy="50" r="20" fill="none" stroke="#0a397c" stroke-width="2" />
-                    </svg>
-                </div>
+<div id="blazor-error-ui">
+    <div class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <!-- Heroicon name: mini/x-circle -->
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">В процессе работы возникли необработанные исключения. Смотри консоль за подробностями. Перезапустите страницу</h3>
             </div>
         </div>
     </div>
-    <div id="blazor-error-ui">
-        В приложении произошла необработанная ошибка..
-        <a href="" class="reload">Перезагрузить</a>
-        <a class="dismiss">🗙</a>
+</div>
+<div id="app">
+    <div class="appLoad">
+        <div class="profile-main-loader">
+            <div class="loader">
+                <svg class="circular-loader" viewBox="25 25 50 50">
+                    <circle class="loader-path" cx="50" cy="50" r="20" fill="none" stroke="#0a397c" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+</div>
+
+<script src="_framework/blazor.webassembly.js"></script>
+<script>navigator.serviceWorker.register('service-worker.js');</script>
 </body>
 </html>

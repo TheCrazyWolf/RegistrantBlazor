@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
+using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers
@@ -65,11 +66,13 @@ namespace RegistrantApplication.Server.Controllers
                     .Take((int)recordsByPage)
                     .ToList();
 
-                totalRecords = _ef.Contragents.Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper())).Count();
+                totalRecords = 
+                    _ef.Contragents.Count(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper()
+                        .Contains(search.ToUpper()));
                 totalPages = totalRecords / recordsByPage;
             }
 
-            ViewDrivers view = new ViewDrivers()
+            IViewAPI view = new ViewDrivers()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,

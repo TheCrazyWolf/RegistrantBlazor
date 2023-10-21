@@ -8,12 +8,13 @@ public class Drivers : BaseController
 {
     public Drivers(string urlConnection) : base(urlConnection)
     {
+        _urlController = "Drivers";
     }
     
-    public async Task<RestResponse> Get(string? searchTitle, long page, bool showDeleted)
+    public async Task<RestResponse> Get(string? search, long page, bool showDeleted)
     {
-        var request = new RestRequest(resource: "Drivers/Get", method: Method.Get);
-        request.AddParameter("search", searchTitle);
+        var request = new RestRequest(resource: $"{_urlController}/Get", method: Method.Get);
+        request.AddParameter("search", search);
         request.AddParameter("page", page);
         request.AddParameter("showDeleted", showDeleted);
 
@@ -22,7 +23,7 @@ public class Drivers : BaseController
 
     public async Task<RestResponse> Get(long idDriver)
     {
-        var request = new RestRequest(resource: "Driver/GetById", method: Method.Get);
+        var request = new RestRequest(resource: $"{_urlController}/GetById", method: Method.Get);
         request.AddParameter("idDriver", idDriver);
         return await _client.ExecuteAsync(request);
     }

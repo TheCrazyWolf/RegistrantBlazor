@@ -85,7 +85,7 @@
     
     public override async void Sumbit()
     {
-        var result = await api.Contragents.Update(Contragent);
+        var result = await api.Contragents.Update(token: "", Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
+using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Contragents;
 
 namespace RegistrantApplication.Server.Controllers
@@ -16,6 +17,9 @@ namespace RegistrantApplication.Server.Controllers
         [HttpGet("Get")]
         public IActionResult Get(string? search, long page, bool showDeleted)
         {
+            if (!IsValidateToken().Result)
+                return Unauthorized("Требуется авторизация");
+            
             if (page < 0 )
                 return BadRequest("Страница отрицательная");
 
@@ -53,7 +57,7 @@ namespace RegistrantApplication.Server.Controllers
                 totalPages = totalRecords / recordsByPage;
             }
 
-            ViewContragents view = new ViewContragents()
+            IViewAPI view = new ViewContragents()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
@@ -68,6 +72,9 @@ namespace RegistrantApplication.Server.Controllers
         [HttpPost("Create")]
         public IActionResult Create([FromBody] Contragent contragent)
         {
+            if (!IsValidateToken().Result)
+                return Unauthorized("Требуется авторизация");
+            
             if (string.IsNullOrEmpty(contragent.Title))
                 return BadRequest("Название контрагента не может быть пустым");
 
@@ -84,6 +91,9 @@ namespace RegistrantApplication.Server.Controllers
         [HttpPut("Update")]
         public IActionResult Update([FromBody] Contragent contragent)
         {
+            if (!IsValidateToken().Result)
+                return Unauthorized("Требуется авторизация");
+            
             var found = _ef.Contragents
                 .FirstOrDefault(x=> x.IdContragent == contragent.IdContragent);
 
@@ -103,6 +113,9 @@ namespace RegistrantApplication.Server.Controllers
         [HttpDelete("Delete")]
         public IActionResult Delete([FromBody] long[] idsContragents) 
         {
+            if (!IsValidateToken().Result)
+                return Unauthorized("Требуется авторизация");
+            
             foreach (var item in idsContragents)
             {
                 var found = _ef.Contragents.FirstOrDefault(x => x.IdContragent == item);

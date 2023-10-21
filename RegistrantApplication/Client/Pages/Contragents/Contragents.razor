@@ -200,13 +200,13 @@
 
     protected async Task<ViewContragents> DoRequestAsync()
     {
-        RestResponse result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
+        RestResponse result = await Api.Contragents.Get(token: "", search: Search, page: Page, showDeleted: ShowDeleted);
         if(result.IsSuccessStatusCode)
             return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
         else
         {
             Page = 0;
-            result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
+            result = await Api.Contragents.Get(token: "", search: Search, page: Page, showDeleted: ShowDeleted);
             return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
         }
     }

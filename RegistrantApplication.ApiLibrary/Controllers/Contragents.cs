@@ -8,42 +8,68 @@ namespace RegistrantApplication.ApiLibrary.Controllers
     {
         public Contragents(string urlConnection) : base(urlConnection)
         {
+            _urlController = "Contragents";
         }
 
-        public async Task<RestResponse> Create(Contragent contragent)
+        /// <summary>
+        /// Создание контрагента на сервере
+        /// </summary>
+        /// <param name="token">Текущий валидный токен</param>
+        /// <param name="contragent">Модель контрагента</param>
+        /// <returns></returns>
+        public async Task<RestResponse> Create(string? token, Contragent? contragent)
         {
-            var request = new RestRequest(resource: "Contragents/Create", method: Method.Post);
-
+            var request = new RestRequest(resource: $"{_urlController}/Create", method: Method.Post);
             request.AddBody(contragent);
+            request.AddHeader("Token", token);
 
             return await _client.ExecuteAsync(request);
         }
 
-        public async Task<RestResponse> Update(Contragent contragent)
+        /// <summary>
+        /// Обновление контрагента на сервере
+        /// </summary>
+        /// <param name="token">Текущий валидный токен</param>
+        /// <param name="contragent">Новая модель контрагента, ID не должен изменится!</param>
+        /// <returns></returns>
+        public async Task<RestResponse> Update(string token, Contragent contragent)
         {
-            var request = new RestRequest(resource: "Contragents/Update", method: Method.Put);
-
+            var request = new RestRequest(resource: $"{_urlController}/Update", method: Method.Put);
             request.AddBody(contragent);
-
+            request.AddHeader("Token", token);
+            
             return await _client.ExecuteAsync(request);
         }
 
-        public async Task<RestResponse> Delete(long[] idsContragents)
+        /// <summary>
+        /// Установка флажка "Удален" контрагентами
+        /// </summary>
+        /// <param name="token">Текущий валидный токен</param>
+        /// <param name="idsContragents">Массив ИД контрагентов</param>
+        /// <returns></returns>
+        public async Task<RestResponse> Delete(string token, long[] idsContragents)
         {
-            var request = new RestRequest(resource: "Contragents/Delete", method: Method.Delete);
-
+            var request = new RestRequest(resource: $"{_urlController}/Delete", method: Method.Delete);
             request.AddBody(idsContragents);
-
+            request.AddHeader("Token", token);
             return await _client.ExecuteAsync(request);
         }
 
-        public async Task<RestResponse> Get(string? searchTitle, long pageNumber, bool showDeleted)
+        /// <summary>
+        /// Получить список постранично контрагентов
+        /// </summary>
+        /// <param name="token">Текущий валидный токен</param>
+        /// <param name="search">Поисковый запрос</param>
+        /// <param name="page">Номер страницы</param>
+        /// <param name="showDeleted">Показать удаленных</param>
+        /// <returns></returns>
+        public async Task<RestResponse> Get(string token, string? search, long page, bool showDeleted)
         {
-            var request = new RestRequest(resource: "Contragents/Get", method: Method.Get);
-
-            request.AddParameter(name: "search", value: searchTitle);
-            request.AddParameter(name: "page", value: pageNumber);
+            var request = new RestRequest(resource: $"{_urlController}/Get", method: Method.Get);
+            request.AddParameter(name: "search", value: search);
+            request.AddParameter(name: "page", value: page);
             request.AddParameter(name: "showDeleted", value: showDeleted);
+            request.AddHeader("Token", token);
 
             return await _client.ExecuteAsync(request);
         }

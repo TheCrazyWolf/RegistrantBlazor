@@ -87,7 +87,7 @@
 
     public virtual async void Sumbit()
     {
-        var result = await api.Contragents.Create(Contragent);
+        var result = await api.Contragents.Create(token:"", Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

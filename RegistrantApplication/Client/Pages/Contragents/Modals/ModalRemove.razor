@@ -98,7 +98,7 @@
             ids.Add(item.IdContragent);
         }
 
-        var result = await api.Contragents.Delete(ids.ToArray());
+        var result = await api.Contragents.Delete(token: "", ids.ToArray());
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

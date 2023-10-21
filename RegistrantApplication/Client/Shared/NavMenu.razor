@@ -1,9 +1,40 @@
-﻿<a href="/dashboard" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Рабочий стол</a>
+﻿@using RegistrantApplication.ApiLibrary
+@using Blazored.LocalStorage
+@using Newtonsoft.Json
+@using RegistrantApplication.Shared.API.Accounts
+@using System.Net
+
+@inject RApi Api;
+@inject ISyncLocalStorageService _StorageService;
+@inject NavigationManager Navigation;
+
+<a href="/dashboard" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Рабочий стол</a>
 <a href="/contragents" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Контрагенты</a>
 <a href="/drivers" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Водители</a>
 
-
+@if (AccountDetails != null)
+{
+    <a href="/drivers" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">@AccountDetails.Family</a>
+    <a href="/drivers" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">@AccountDetails.Name</a>
+}
 
 @code {
+
+    public AccountDetails? AccountDetails { get; set; }
     
+    protected override async Task OnInitializedAsync()
+    {
+        var lastSession = _StorageService.GetItem<SessionResult>("lastSession");
+        
+        if(lastSession == null)
+            Navigation.NavigateTo("/security/action/login", true);
+        
+        var responce = await Api.Security.GetAccountDetails(token: lastSession.Token);
+
+        if (responce.StatusCode == HttpStatusCode.Unauthorized)
+            Navigation.NavigateTo("/security/action/login", true);
+        
+        AccountDetails = JsonConvert.DeserializeObject<AccountDetails>(responce.Content);
+    }
+
 }

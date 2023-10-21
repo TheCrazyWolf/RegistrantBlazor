@@ -51,7 +51,7 @@
 
     public async Task<ViewDrivers> DoRequestAsync()
     {
-        var result = await Api.Drivers.Get(searchTitle: Search, page: Page, showDeleted: ShowDeleted);
+        /*var result = await Api.Drivers.Get(token: "", search Search, page: Page, showDeleted: ShowDeleted);
         if(result.IsSuccessStatusCode)
             return JsonConvert.DeserializeObject<ViewDrivers>(result.Content);
         else
@@ -59,7 +59,9 @@
             Page = 0;
             result = await Api.Contragents.Get(searchTitle: Search, pageNumber: Page, showDeleted: ShowDeleted);
             return JsonConvert.DeserializeObject<ViewDrivers>(result.Content);
-        }
+        }*/
+
+        return null;
     }
 
 }

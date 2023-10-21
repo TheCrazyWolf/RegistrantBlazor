@@ -13,7 +13,7 @@ namespace RegistrantApplication.Shared.Drivers
         public string? PhoneNumber { get; set; }
         public List<Auto>? Autos { get; set; }
         public List<Document>? Documents { get; set; }
-        public bool IsDriver { get; set; }
+        public bool IsEmployee { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

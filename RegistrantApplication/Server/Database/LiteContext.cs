@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Shared.Accounts;
 using RegistrantApplication.Shared.Contragents;
 using RegistrantApplication.Shared.Drivers;
 using RegistrantApplication.Shared.Orders;
@@ -8,6 +9,7 @@ namespace RegistrantApplication.Server.Database
     public class LiteContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Session> Sessions { get; set; }
         public DbSet<Auto> Autos { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Contragent> Contragents { get; set; }

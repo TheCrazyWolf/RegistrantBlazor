@@ -1,5 +1,6 @@
 ﻿@page "/contragents"
 @inject RApi Api
+@inject ISyncLocalStorageService Storage;
 
 @using Newtonsoft.Json;
 @using RegistrantApplication.ApiLibrary;
@@ -7,6 +8,10 @@
 @using RegistrantApplication.Shared.API;
 @using RegistrantApplication.Shared.Contragents;
 @using RestSharp;
+@using Blazored.LocalStorage
+@using RegistrantApplication.Shared.API.Accounts
+
+
 
 <PageTitle>Контрагенты</PageTitle>
 <ModalCreate @ref="ModalCreate" />
@@ -200,7 +205,7 @@
 
     protected async Task<ViewContragents> DoRequestAsync()
     {
-        RestResponse result = await Api.Contragents.Get(token: "", search: Search, page: Page, showDeleted: ShowDeleted);
+        RestResponse result = await Api.Contragents.Get(token: Storage.GetItem<SessionResult>("lastSession").Token, search: Search, page: Page, showDeleted: ShowDeleted);
         if(result.IsSuccessStatusCode)
             return JsonConvert.DeserializeObject<ViewContragents>(result.Content);
         else

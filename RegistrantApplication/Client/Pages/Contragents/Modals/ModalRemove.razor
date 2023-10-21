@@ -1,6 +1,9 @@
 ﻿@using RegistrantApplication.ApiLibrary;
 @using RegistrantApplication.Shared.Contragents;
+@using Blazored.LocalStorage
+@using RegistrantApplication.Shared.API.Accounts
 @inject RApi api;
+@inject ISyncLocalStorageService Storage;
 
 @if (IsDisplay)
 {
@@ -98,7 +101,7 @@
             ids.Add(item.IdContragent);
         }
 
-        var result = await api.Contragents.Delete(token: "", ids.ToArray());
+        var result = await api.Contragents.Delete(token: Storage.GetItem<SessionResult>("lastSession").Token, ids.ToArray());
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

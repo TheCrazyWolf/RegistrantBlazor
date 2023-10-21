@@ -7,13 +7,59 @@ using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers
 {
-    public class Drivers : BaseController
+    public class Accounts : BaseController
     {
-        public Drivers(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
+        public Accounts(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
         {
         }
 
 
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create([FromBody] Account account, IFormFile[] files)
+        {
+            
+            if (!IsValidateToken().Result)
+                return Unauthorized("Требуется авторизация");
+
+            account.Family = account.Family.ToUpper();
+            account.Name = account.Name.ToUpper();
+            if (!string.IsNullOrEmpty(account.Patronymic))
+                account.Patronymic = account.Patronymic.ToUpper();
+            if (!string.IsNullOrEmpty(account.PasswordHash))
+                account.PasswordHash = Security.GetMd5(account.PasswordHash).Result;
+            account.IsDeleted = false;
+
+            if (account.Documents == null)
+                account.Documents = new List<Document>();
+            foreach (var file in files)
+            {
+                var uploadPath = $"{Directory.GetCurrentDirectory()}/uploads";
+                // создаем папку для хранения файлов
+                Directory.CreateDirectory(uploadPath);
+                
+                // путь к папке uploads
+                string fullPath = $"{uploadPath}/{file.FileName}";
+            
+                // сохраняем файл в папку uploads
+                using (var fileStream = new FileStream(fullPath, FileMode.OpenOrCreate))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                
+                Document doc = new Document();
+                doc.Name = file.FileName;
+                doc.Data = System.IO.File.ReadAllBytes(fullPath);
+                
+                account.Documents.Add(doc);
+            }
+            
+
+            await _ef.AddAsync(account);
+            await _ef.SaveChangesAsync();
+
+            return Ok();
+        }
+        
         [HttpGet("GetById")]
         public IActionResult GetById(long idDriver)
         {

@@ -18,13 +18,14 @@ public class Security : BaseController
     /// <param name="family">Фамилия</param>
     /// <param name="isEmployee">Авторизоваться как сотрудник</param>
     /// <returns></returns>
-    public async Task<RestResponse> GetToken(string phone, string? password, string? family, bool isEmployee)
+    public async Task<RestResponse> GetToken(string phone, string? password, string? family, bool isEmployee, string? fingerprint)
     {
         var request = new RestRequest($"{_urlController}/GetToken", Method.Get);
         request.AddParameter("phone", phone);
         request.AddParameter("password", password);
         request.AddParameter("family", family);
         request.AddParameter("isEmployee", isEmployee);
+        request.AddParameter("FingerPrintIdentity", fingerprint);
 
         return await _client.ExecuteAsync(request);
     }

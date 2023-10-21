@@ -1,4 +1,5 @@
 ﻿using RegistrantApplication.ApiLibrary.Controllers;
+using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.ApiLibrary
 {
@@ -9,9 +10,9 @@ namespace RegistrantApplication.ApiLibrary
         /// </summary>
         public Contragents Contragents { get; private set; }
         /// <summary>
-        /// Методы для с Водителями
+        /// Методы для с Аккаунтами
         /// </summary>
-        public Drivers Drivers { get; private set; }
+        public Accounts Accounts { get; private set; }
         /// <summary>
         /// Методы для работы с Авторизацией
         /// </summary>
@@ -19,7 +20,7 @@ namespace RegistrantApplication.ApiLibrary
         public RApi(string urlConnection)
         {
             Contragents = new Contragents(urlConnection);
-            Drivers = new Drivers(urlConnection);
+            Accounts = new Accounts(urlConnection);
             Security = new Security(urlConnection);
         }
     }

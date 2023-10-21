@@ -7,7 +7,6 @@ namespace RegistrantApplication.Shared.Drivers
     {
         [Key]
         public long IdDocument { get; set; }
-        public string Title { get; set; }
         public string Name { get; set; }
         public byte[] Data { get; set; }
     }

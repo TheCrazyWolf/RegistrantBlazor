@@ -109,7 +109,7 @@ public class Security : BaseController
     
     
     [NonAction]
-    private static async Task<string> GetMd5(string input)
+    public static async Task<string> GetMd5(string input)
     {
         using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
         {

@@ -1,7 +1,11 @@
 ﻿@using RegistrantApplication.ApiLibrary;
+@using RegistrantApplication.Shared.API.Accounts
 @using RegistrantApplication.Shared.Contragents;
+@using Blazored.LocalStorage
 @inherits ModalCreate
+
 @inject RApi api;
+@inject ISyncLocalStorageService Storage;
 
 @if (IsDisplay)
 {
@@ -85,7 +89,7 @@
     
     public override async void Sumbit()
     {
-        var result = await api.Contragents.Update(token: "", Contragent);
+        var result = await api.Contragents.Update(token: Storage.GetItem<SessionResult>("lastSession").Token, Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

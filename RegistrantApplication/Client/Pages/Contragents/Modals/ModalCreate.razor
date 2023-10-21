@@ -1,6 +1,10 @@
 ﻿@using RegistrantApplication.ApiLibrary;
+@using RegistrantApplication.Shared.API.Accounts
 @using RegistrantApplication.Shared.Contragents;
+@using Blazored.LocalStorage
+
 @inject RApi api;
+@inject ISyncLocalStorageService Storage;
 
 @if(IsDisplay)
 {
@@ -87,7 +91,7 @@
 
     public virtual async void Sumbit()
     {
-        var result = await api.Contragents.Create(token:"", Contragent);
+        var result = await api.Contragents.Create(token: Storage.GetItem<SessionResult>("lastSession").Token, Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

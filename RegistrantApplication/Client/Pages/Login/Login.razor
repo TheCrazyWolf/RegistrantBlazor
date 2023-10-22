@@ -1,5 +1,6 @@
 ﻿@page "/security/action/login"
 @layout SecurityLayout;
+@implements RegistrantApplication.Shared.IModal
 
 @using RegistrantApplication.ApiLibrary
 @using Blazored.LocalStorage
@@ -10,15 +11,15 @@
 @inject ISyncLocalStorageService StorageService;
 @inject NavigationManager Navigation;
 
-<div class="relative z-10  @propertySmoothShowBackground" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div class="relative z-10  @PropertySmoothShowBackground" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity @PropertyBlur"></div>
     <div class="fixed inset-0 z-10 w-screen overflow-y-auto ">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 @propertySmoothShowModal">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 @PropertySmoothShowModal">
             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class=" sm:items-start">
                         <div class="text-center sm:mt-0 sm:text-left">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">Вход в систему</h3>
+                            <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">@PropertyTitle</h3>
                             <div class="mt-2">
                                 <form>
                                     <div class="mt-4 relative rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600">
@@ -43,7 +44,7 @@
                                 </form>
                             </div>
 
-                            @if (!string.IsNullOrEmpty(ErrorMessageContent))
+                            @if (!string.IsNullOrEmpty(PropertyErrorMsg))
                             {
                                 <div class="mt-2 border-l-4 border-yellow-400 bg-yellow-50 p-4">
                                     <div class="flex">
@@ -55,7 +56,7 @@
                                         </div>
                                         <div class="ml-3">
                                             <p class="text-sm text-yellow-700">
-                                                @ErrorMessageContent.Replace("\"", string.Empty)
+                                                @PropertyErrorMsg.Replace("\"", string.Empty)
                                             </p>
                                         </div>
                                     </div>
@@ -66,7 +67,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
 
-                    <button type="button" @onclick="Submit" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-normal text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">Авторизация</button>
+                    <button type="button" @onclick="SubmitAsync" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-normal text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">Авторизация</button>
                     @*<button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-normal text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Вход для водителей</button>*@
                 </div>
             </div>
@@ -88,41 +89,49 @@
     [SupplyParameterFromQuery]
     public bool IsEmployee { get; set; }
 
-    private string? propertySmoothShowBackground = "ease-out duration-200 opacity-0";
-    private string propertySmoothShowModal = "ease-in duration-200 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95";
-    public string PropertyBlur = "backdrop-blur-md";
 
-    private string ErrorMessageContent;
+    public string IdModal { get; set; }
+    public bool IsDisplay { get; set; }
+    public string PropertyTitle { get; set; }
+    public string PropertySmoothShowBackground { get; set; }
+    public string PropertySmoothShowModal { get; set; }
+    public string PropertyBlur { get; set; }
+    public string PropertyErrorMsg { get; set; }
 
+    public Login()
+    {
+        IdModal = "DefaultAuth";
+        IsDisplay = true;
+        PropertyTitle = "Вход в систему";
+        PropertySmoothShowBackground = "ease-out duration-200 opacity-0";
+        PropertySmoothShowModal = "ease-in duration-200 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95";
+        PropertyBlur = "backdrop-blur-md";
+    }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Task.Delay(10);
-        propertySmoothShowBackground = "ease-out duration-200 opacity-100";
-        propertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
-        IsEmployee = true;
-        StateHasChanged();
+        await ShowAsync();
     }
 
-    private async void Submit()
+    public async void SubmitAsync()
     {
-        propertySmoothShowBackground = "ease-out duration-200 opacity-0";
-        propertySmoothShowModal = "ease-in duration-200 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95";
+        PropertySmoothShowBackground = "ease-out duration-200 opacity-0";
+        PropertySmoothShowModal = "ease-in duration-200 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95";
         StateHasChanged();
 
         if (string.IsNullOrEmpty(Phone))
         {
-            ErrorMessageContent = "Не заполнены обязательные поля";
+            PropertyErrorMsg = "Не заполнены обязательные поля";
             return;
         }
 
         var responce = await Api.Security.GetToken(phone: Phone, password: Password, isEmployee: true, family: null, fingerprint: "");
         if (!responce.IsSuccessStatusCode)
         {
-            ErrorMessageContent = responce.Content;
-            propertySmoothShowBackground = "ease-out duration-200 opacity-100";
-            propertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
+            PropertyErrorMsg = responce.Content;
+            PropertySmoothShowBackground = "ease-out duration-200 opacity-100";
+            PropertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
             StateHasChanged();
-            ;
             return;
         }
 
@@ -130,5 +139,32 @@
         StorageService.SetItem<SessionResult>("lastSession", result);
         Navigation.NavigateTo("/");
     }
+    
+    public async Task<bool> ShowAsync()
+    {
+        await Task.Delay(250);
+        PropertySmoothShowBackground = "ease-out duration-200 opacity-100";
+        PropertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
+        IsEmployee = true;
+        StateHasChanged();
+        return await Task.Run(WaitForResult);
+    }
 
+    public async void CloseAsync()
+    {
+        await Task.Delay(10);
+        PropertySmoothShowBackground = "ease-out duration-200 opacity-0";
+        PropertySmoothShowModal = "ease-in duration-200 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95";
+        StateHasChanged();
+    }
+    
+    public async Task<bool> WaitForResult()
+    {
+        while (IsDisplay)
+        {
+            await Task.Delay(150);
+        }
+
+        return true;
+    }
 }

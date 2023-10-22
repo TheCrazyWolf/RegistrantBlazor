@@ -140,10 +140,10 @@
     private ViewContragents? ViewData { get; set; } 
 
     /* Выбранные контрагенты */
-    private List<Contragent> SelectedContragents { get; set; } 
+    private List<Contragent> SelectedContragents { get; set; }
 
-    IModal modalContragentCreate;
-    IModal modalContragentRemove;
+    IModal? modalContragentCreate = new ModalContragentCreate();
+    IModal? modalContragentRemove;
 
     public Contragents()
     {
@@ -156,10 +156,9 @@
         ViewData = await DoRequestAsync();
     }
     
-    private void ContragentCreateEdit()
+    private async void ContragentCreateEdit()
     {
-        modalContragentCreate = new ModalContragentCreate();
-        var task = modalContragentCreate.ShowAsync();
+        var task = await modalContragentCreate.ShowAsync();
         var task2 = OnInitializedAsync();
         StateHasChanged();
     }

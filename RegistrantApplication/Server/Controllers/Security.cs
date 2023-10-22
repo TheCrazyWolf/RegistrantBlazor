@@ -11,9 +11,9 @@ namespace RegistrantApplication.Server.Controllers;
 
 [ApiController]
 [Microsoft.AspNetCore.Mvc.Route("[controller]")]
-public class Security : BaseController
+public class Security : BaseApiController
 {
-    public Security(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
+    public Security(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
     {
     }
 

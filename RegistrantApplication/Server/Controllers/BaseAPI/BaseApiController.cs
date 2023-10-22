@@ -5,13 +5,13 @@ using RegistrantApplication.Shared.Accounts;
 
 namespace RegistrantApplication.Server.Controllers.Base
 {
-    public class BaseController : ControllerBase
+    public class BaseApiController : ControllerBase
     {
-        protected readonly ILogger<BaseController> _logger;
+        protected readonly ILogger<BaseApiController> _logger;
         protected readonly LiteContext _ef;
         protected Session? _session;
         
-        public BaseController(ILogger<BaseController> logger, LiteContext ef)
+        public BaseApiController(ILogger<BaseApiController> logger, LiteContext ef)
         {
             _logger = logger;
             _ef = ef;

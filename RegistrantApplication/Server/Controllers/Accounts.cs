@@ -8,9 +8,9 @@ using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers
 {
-    public class Accounts : BaseController
+    public class Accounts : BaseApiController
     {
-        public Accounts(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
+        public Accounts(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
         {
         }
 

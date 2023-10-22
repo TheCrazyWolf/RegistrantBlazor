@@ -9,9 +9,9 @@ namespace RegistrantApplication.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Contragents : BaseController
+    public class Contragents : BaseApiController
     {
-        public Contragents(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
+        public Contragents(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
         {
         }
 

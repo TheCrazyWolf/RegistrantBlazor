@@ -2,15 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class Autos : BaseController
+public class Autos : BaseApiController
 {
   
-    public Autos(ILogger<BaseController> logger, LiteContext ef) : base(logger, ef)
+    public Autos(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
     {
     }
 
@@ -30,12 +31,46 @@ public class Autos : BaseController
         return Ok(account.Autos.ToList());
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> Delete(long[] idAutos)
+    [HttpPut("Update")]
+    public async Task<IActionResult> Update([FromBody] Auto auto)
     {
         if (!IsValidateToken().Result)
             return Unauthorized("Требуется авторизация");
-        
-        
+
+        var foundAuto = await _ef.Autos
+            .FirstOrDefaultAsync(x => x.IdAuto == auto.IdAuto);
+
+        if (foundAuto == null)
+            return NoContent();
+
+        foundAuto.Title = auto.Title?.ToUpper();
+        foundAuto.AutoNumber = auto.AutoNumber.ToUpper();
+        foundAuto.IsDeleted = auto.IsDeleted;
+
+        _ef.Update(foundAuto);
+        await _ef.SaveChangesAsync();
+        return Ok();
+    }
+    
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> Delete([FromBody]long[] idAutos)
+    {
+        if (!IsValidateToken().Result)
+            return Unauthorized("Требуется авторизация");
+
+        foreach (var item in idAutos)
+        {
+            var foundAuto = await _ef.Autos
+                .FirstOrDefaultAsync(x => x.IdAuto == item);
+            
+            if(foundAuto == null)
+                continue;
+
+            foundAuto.IsDeleted = true;
+            _ef.Update(foundAuto);
+            await _ef.SaveChangesAsync();
+        }
+
+        return Ok();
     } 
 }

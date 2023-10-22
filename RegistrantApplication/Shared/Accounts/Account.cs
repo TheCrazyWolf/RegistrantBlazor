@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace RegistrantApplication.Shared.Drivers
 {
@@ -9,7 +11,7 @@ namespace RegistrantApplication.Shared.Drivers
         public required string Family { get; set; }
         public required string Name { get; set; }
         public string? Patronymic { get; set; }
-        public string? PasswordHash { get; set; }
+        [JsonIgnore] public string? PasswordHash { get; set; }
         public string? PhoneNumber { get; set; }
         public List<Auto>? Autos { get; set; }
         public List<Document>? Documents { get; set; }

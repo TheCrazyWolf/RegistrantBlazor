@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Accounts;
@@ -10,7 +11,7 @@ using RegistrantApplication.Shared.Drivers;
 namespace RegistrantApplication.Server.Controllers;
 
 [ApiController]
-[Microsoft.AspNetCore.Mvc.Route("[controller]")]
+[Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
 public class Security : BaseApiController
 {
     public Security(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
@@ -21,10 +22,10 @@ public class Security : BaseApiController
     public async Task<IActionResult> GetAccountDetails()
     {
         if (!IsValidateToken().Result)
-            return Unauthorized("Требуется авторизация");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         if(_session == null)
-            return Unauthorized("Требуется авторизация");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
         
         AccountDetails details = new AccountDetails()
         {
@@ -62,12 +63,12 @@ public class Security : BaseApiController
         {
             foundAccount = await _ef.Accounts
                 .FirstOrDefaultAsync(x =>
-                    x.PhoneNumber.ToUpper() == phone.ToUpper() && GetMd5(password).Result == x.PasswordHash &&
+                    x.PhoneNumber.ToUpper() == Accounts.ValidationNumber(phone.ToUpper()) && GetMd5(password).Result == x.PasswordHash &&
                     x.IsEmployee == true);
         }
         
         if (foundAccount == null)
-            return Unauthorized("Пользователь не найден");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
         
         var session = new Session()
         {

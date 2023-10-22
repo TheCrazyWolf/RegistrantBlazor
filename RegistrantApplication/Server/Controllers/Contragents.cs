@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
@@ -8,7 +9,7 @@ using RegistrantApplication.Shared.Contragents;
 namespace RegistrantApplication.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class Contragents : BaseApiController
     {
         public Contragents(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
@@ -19,19 +20,17 @@ namespace RegistrantApplication.Server.Controllers
         public IActionResult Get(string? search, long page, bool showDeleted)
         {
             if (!IsValidateToken().Result)
-                return Unauthorized("Требуется авторизация");
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
             
             if (page < 0 )
-                return BadRequest("Страница отрицательная");
-
-            const long recordsByPage = 10;
+                return BadRequest(ConfigMsg.PaginationError);
 
             long totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
 
-            long totalPages = totalRecords / recordsByPage;
+            long totalPages = totalRecords / ConfigServer.RecordsByPage;
 
             if (page > totalPages)
-                return BadRequest("Страница за пределами количество страниц)");
+                return BadRequest(ConfigMsg.PaginationError);
             
             List<Contragent> data;
 
@@ -40,8 +39,8 @@ namespace RegistrantApplication.Server.Controllers
                data = _ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => x.IsDeleted == showDeleted)
-                    .Skip((int)(page * recordsByPage))
-                    .Take((int)recordsByPage)
+                    .Skip((int)(page * ConfigServer.RecordsByPage))
+                    .Take((int)ConfigServer.RecordsByPage)
                     .ToList();
                 totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
             }
@@ -50,12 +49,12 @@ namespace RegistrantApplication.Server.Controllers
                 data = _ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper()))
-                    .Skip((int)(page * recordsByPage))
-                    .Take((int)recordsByPage)
+                    .Skip((int)(page * ConfigServer.RecordsByPage))
+                    .Take((int)ConfigServer.RecordsByPage)
                     .ToList();
 
                 totalRecords = _ef.Contragents.Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper())).Count();
-                totalPages = totalRecords / recordsByPage;
+                totalPages = totalRecords / ConfigServer.RecordsByPage;
             }
 
             IViewAPI view = new ViewContragents()
@@ -64,7 +63,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalPages = totalPages,
                 CurrentPage = page,
                 Contragents = data,
-                MaxRecordsOnPageConst = recordsByPage
+                MaxRecordsOnPageConst = ConfigServer.RecordsByPage
             };
 
             return Ok(view);
@@ -74,13 +73,13 @@ namespace RegistrantApplication.Server.Controllers
         public IActionResult Create([FromBody] Contragent contragent)
         {
             if (!IsValidateToken().Result)
-                return Unauthorized("Требуется авторизация");
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
             
             if (string.IsNullOrEmpty(contragent.Title))
-                return BadRequest("Название контрагента не может быть пустым");
+                return BadRequest(ConfigMsg.ValidationTextEmpty);
 
             if (_ef.Contragents.Any(x => x.Title.ToUpper() == contragent.Title.ToUpper() && x.IsDeleted == false))
-                return BadRequest("Такой контрагент уже существует");
+                return BadRequest(ConfigMsg.ValidationElementtExist);
             
             contragent.DateTimeCreated = DateTime.Now;
             contragent.Title = contragent.Title.ToUpper();
@@ -93,16 +92,16 @@ namespace RegistrantApplication.Server.Controllers
         public IActionResult Update([FromBody] Contragent contragent)
         {
             if (!IsValidateToken().Result)
-                return Unauthorized("Требуется авторизация");
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
             
             var found = _ef.Contragents
                 .FirstOrDefault(x=> x.IdContragent == contragent.IdContragent);
 
             if (found == null)
-                return NotFound("Элемент не найден");
+                return NotFound(ConfigMsg.ValidationElementNotFound);
 
             if (string.IsNullOrEmpty(contragent.Title))
-                return BadRequest("Новое имя агента не должно быть пустым");
+                return BadRequest(ConfigMsg.ValidationTextEmpty);
 
             found.Title = contragent.Title.ToUpper();
             found.IsDeleted = contragent.IsDeleted;
@@ -115,7 +114,7 @@ namespace RegistrantApplication.Server.Controllers
         public IActionResult Delete([FromBody] long[] idsContragents) 
         {
             if (!IsValidateToken().Result)
-                return Unauthorized("Требуется авторизация");
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
             
             foreach (var item in idsContragents)
             {

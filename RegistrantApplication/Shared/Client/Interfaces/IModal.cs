@@ -1,4 +1,6 @@
-﻿namespace RegistrantApplication.Shared;
+﻿using RegistrantApplication.Shared.Contragents;
+
+namespace RegistrantApplication.Shared;
 
 public interface IModal
 {
@@ -37,10 +39,14 @@ public interface IModal
     /// Отправка формы
     /// </summary>
     void SubmitAsync();
+
     /// <summary>
     /// Показать форму формы
     /// </summary>
+    /// <param name="contragent"></param>
+    /// <param name="value"></param>
     Task<bool> ShowAsync();
+    Task<bool> ShowAsync(object data);
     /// <summary>
     /// Ожидание результата диалога
     /// </summary>

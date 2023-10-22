@@ -1,5 +1,4 @@
 ﻿@page "/security/action/logout"
-@implements RegistrantApplication.Shared.IModal
 
 @using RegistrantApplication.ApiLibrary
 @using Blazored.LocalStorage
@@ -55,12 +54,9 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ShowAsync();
+        await ShowAsync();
     }
-
-    public async void SubmitAsync()
-    {
-    }
+    
     
     public async Task<bool> ShowAsync()
     {
@@ -84,7 +80,7 @@
             return;
         }
 
-        string[] tokens = new[] { sessionCurrent.Token };
+        var tokens = new[] { sessionCurrent.Token };
         await Api.Security.PostResetToken(tokens);
         StorageService.RemoveItem("lastSession");
         Navigation.NavigateTo("/security/action/login");
@@ -100,5 +96,5 @@
         return true;
     }
     
-    
+
 }

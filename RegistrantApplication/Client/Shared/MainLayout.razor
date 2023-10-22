@@ -100,12 +100,12 @@
         var lastSession = _StorageService.GetItem<SessionResult>("lastSession");
 
         if (lastSession == null)
-            Navigation.NavigateTo("/security/action/login", true);
+            Navigation.NavigateTo("/security/action/login");
 
         var responce = await Api.Security.GetAccountDetails(token: lastSession.Token);
 
         if (responce.StatusCode == HttpStatusCode.Unauthorized)
-            Navigation.NavigateTo("/security/action/login", true);
+            Navigation.NavigateTo("/security/action/login");
 
         AccountDetails = JsonConvert.DeserializeObject<AccountDetails>(responce.Content);
     }

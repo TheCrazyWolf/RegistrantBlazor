@@ -3,7 +3,7 @@ using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Shared.API;
 
-public class ViewDrivers : ViewBase
+public class ViewAccounts : ViewBase
 {
     public List<Account> Accounts { get; set; }
 }

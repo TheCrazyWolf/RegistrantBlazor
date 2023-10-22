@@ -1,5 +1,3 @@
-using Blazored.Modal;
-using Microsoft.AspNetCore.ResponseCompression;
 using RegistrantApplication.Server.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<LiteContext>();
+builder.Configuration.AddJsonFile("appsettings.json");
 
 var app = builder.Build();
 

@@ -90,12 +90,11 @@
         StateHasChanged();
     }
 
-    public async Task<bool> ShowAsync()
+    public virtual async Task<bool> ShowAsync()
     {
         IsDisplay = true;
         StateHasChanged();
-        await Task.Delay(1000);
-        StateHasChanged();
+        await Task.Delay(750);
 
         PropertySmoothShowBackground = "ease-out duration-200 opacity-100";
         PropertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
@@ -123,6 +122,11 @@
         await Task.Delay(200);
         IsDisplay = false;
         StateHasChanged();
+    }
+
+    public Task<bool> ShowAsync(object data)
+    {
+        throw new NotImplementedException();
     }
 
 }

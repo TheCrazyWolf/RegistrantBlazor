@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
@@ -8,6 +9,8 @@ using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.Server.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class Accounts : BaseApiController
     {
         public Accounts(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
@@ -20,7 +23,7 @@ namespace RegistrantApplication.Server.Controllers
         {
             
             if (!IsValidateToken().Result)
-                return Unauthorized("Требуется авторизация");
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             account.Family = account.Family.ToUpper();
             account.Name = account.Name.ToUpper();
@@ -71,26 +74,24 @@ namespace RegistrantApplication.Server.Controllers
                 .FirstOrDefault(x => x.IdAccount == idDriver);
 
             if (currentDriver == null)
-                return NotFound("Водитель не найден");
+                return NotFound(ConfigMsg.ValidationElementNotFound);
 
             return Ok(currentDriver);
         }
         
         [HttpGet("Get")]
-        public IActionResult Get(string? search, long page, bool showDeleted)
+        public IActionResult Get(string? search, long page, bool showEmployee, bool showDeleted)
         {
             if (page < 0)
-                return BadRequest("Страница отрицательная");
+                return BadRequest(ConfigMsg.PaginationError);
 
-            const long recordsByPage = 10;
+            long totalRecords = _ef.Accounts
+                .Where(x => x.IsDeleted == showDeleted && x.IsEmployee== showEmployee).Count();
 
-            long totalRecords = _ef.Contragents
-                .Where(x => x.IsDeleted == showDeleted).Count();
-
-            long totalPages = totalRecords / recordsByPage;
+            long totalPages = totalRecords / ConfigServer.RecordsByPage;
 
             if (page > totalPages)
-                return BadRequest("Страница за пределами количество страниц)");
+                return BadRequest(ConfigMsg.PaginationError);
 
             List<Account> data;
 
@@ -98,37 +99,59 @@ namespace RegistrantApplication.Server.Controllers
             {
                 data = _ef.Accounts
                      .OrderBy(x => x.IdAccount)
-                     .Where(x => x.IsDeleted == showDeleted)
-                     .Skip((int)(page * recordsByPage))
-                     .Take((int)recordsByPage)
+                     .Where(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee)
+                     .Skip((int)(page * ConfigServer.RecordsByPage))
+                     .Take((int)ConfigServer.RecordsByPage)
                      .ToList();
-                totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
+                totalRecords = _ef.Accounts.Where(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee).Count();
             }
             else
             {
                 data = _ef.Accounts
                     .OrderBy(x => x.IdAccount)
-                    .Where(x => (x.IsDeleted == showDeleted) && x.Family.ToUpper().Contains(search.ToUpper()))
-                    .Skip((int)(page * recordsByPage))
-                    .Take((int)recordsByPage)
+                    .Where(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) 
+                                && x.Family.ToUpper().Contains(search.ToUpper()))
+                    .Skip((int)(page * ConfigServer.RecordsByPage))
+                    .Take((int)ConfigServer.RecordsByPage)
                     .ToList();
 
                 totalRecords = 
-                    _ef.Contragents.Count(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper()
+                    _ef.Accounts.Count(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) && x.Family.ToUpper()
                         .Contains(search.ToUpper()));
-                totalPages = totalRecords / recordsByPage;
+                totalPages = totalRecords / ConfigServer.RecordsByPage;
             }
 
-            IViewAPI view = new ViewDrivers()
+            IViewAPI view = new ViewAccounts()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
                 Accounts = data,
-                MaxRecordsOnPageConst = recordsByPage
+                MaxRecordsOnPageConst = ConfigServer.RecordsByPage
             };
 
             return Ok(view);
+        }
+
+
+        [NonAction]
+        public static string ValidationNumber(string inpute)
+        {
+            if (string.IsNullOrEmpty(inpute))
+                return inpute;
+            
+            inpute = inpute.Replace(" ", string.Empty)
+                .Replace("+", string.Empty)
+                .Replace("(", string.Empty)
+                .Replace(")", string.Empty)
+                .Replace("-",string.Empty);
+
+            while (inpute[0].ToString() == "8" || inpute[0].ToString() == "7")
+            {
+                inpute = inpute.Substring(1);
+            }
+
+            return inpute;
         }
 
     }

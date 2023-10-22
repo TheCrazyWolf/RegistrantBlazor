@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Drivers;
@@ -7,7 +8,7 @@ using RegistrantApplication.Shared.Drivers;
 namespace RegistrantApplication.Server.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class Autos : BaseApiController
 {
   
@@ -19,7 +20,7 @@ public class Autos : BaseApiController
     public async Task<IActionResult> Get(long idAccount)
     {
         if (!IsValidateToken().Result)
-            return Unauthorized("Требуется авторизация");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         var account = await _ef.Accounts
             .Include(x => x.Autos)
@@ -35,7 +36,7 @@ public class Autos : BaseApiController
     public async Task<IActionResult> Update([FromBody] Auto auto)
     {
         if (!IsValidateToken().Result)
-            return Unauthorized("Требуется авторизация");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         var foundAuto = await _ef.Autos
             .FirstOrDefaultAsync(x => x.IdAuto == auto.IdAuto);
@@ -56,7 +57,7 @@ public class Autos : BaseApiController
     public async Task<IActionResult> Delete([FromBody]long[] idAutos)
     {
         if (!IsValidateToken().Result)
-            return Unauthorized("Требуется авторизация");
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         foreach (var item in idAutos)
         {

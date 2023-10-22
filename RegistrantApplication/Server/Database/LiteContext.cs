@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Shared.Accounts;
+using RegistrantApplication.Shared.Admin;
 using RegistrantApplication.Shared.Contragents;
 using RegistrantApplication.Shared.Drivers;
 using RegistrantApplication.Shared.Orders;
@@ -15,7 +17,7 @@ namespace RegistrantApplication.Server.Database
         public DbSet<Contragent> Contragents { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
-        //public DbSet<Event> Events { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         public LiteContext()
         {
@@ -24,7 +26,7 @@ namespace RegistrantApplication.Server.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=localDatabase.db");
+            optionsBuilder.UseSqlite(ConfigServer.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

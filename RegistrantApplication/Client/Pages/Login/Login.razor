@@ -1,6 +1,5 @@
 ﻿@page "/security/action/login"
 @layout SecurityLayout;
-@implements RegistrantApplication.Shared.IModal
 
 @using RegistrantApplication.ApiLibrary
 @using Blazored.LocalStorage
@@ -137,7 +136,7 @@
 
         SessionResult result = JsonConvert.DeserializeObject<SessionResult>(responce.Content);
         StorageService.SetItem<SessionResult>("lastSession", result);
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/",true);
     }
     
     public async Task<bool> ShowAsync()

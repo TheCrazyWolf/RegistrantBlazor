@@ -41,6 +41,24 @@ namespace RegistrantApplication.Server.Controllers.Base
             return true;
         }
         
-        
+        /// <summary>
+        /// Валидация текущего токена
+        /// </summary>
+        /// <param name="token">Токен для проверки валидации</param>
+        /// <returns>Булевое знание - Валиден/Нет</returns>
+        protected async Task<bool> IsValidateToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return false;
+
+            _session = await _ef.AccountsSessions
+                .Include(x => x.Account)
+                .FirstOrDefaultAsync(x => x.Token == token && x.DateTimeSessionExpired >= DateTime.Now);
+
+            if (_session == null)
+                return false;
+            
+            return true;
+        }
     }
 }

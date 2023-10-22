@@ -18,4 +18,12 @@ namespace RegistrantApplication.Shared.Drivers
         
         public bool IsDeleted { get; set; }
     }
+
+    public enum DocumenType
+    {
+        [Display(Name = "ПАСПОРТ")]
+        Passport,
+        [Display(Name = "ВОД. УДОСТ")]
+        DriverLicense
+    }
 }

@@ -4,6 +4,7 @@ using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
+using RegistrantApplication.Shared.API.Accounts;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Drivers;
 
@@ -17,12 +18,35 @@ namespace RegistrantApplication.Server.Controllers
         {
         }
 
+        /// <summary>
+        /// Получение информации о текущем аккаунте
+        /// </summary>
+        /// <param name="token">Валидный токен</param>
+        /// <returns>Возращает инорфмацию о аккаунте с токенам</returns>
+        [HttpGet("GetAccountDetails")]
+        public async Task<IActionResult> GetAccountDetails([FromHeader] string? token)
+        {
+            if (!IsValidateToken(token).Result)
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+            if (_session == null)
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+            AccountDetails details = new AccountDetails()
+            {
+                Family = _session.Account.Family.ToUpper(),
+                Name = _session.Account.Name.ToUpper(),
+                Patronymic = _session.Account.Patronymic?.ToUpper(),
+                IsEmployee = _session.Account.IsEmployee
+            };
+
+            return Ok(details);
+        }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] Account account, IFormFile[] files)
+        public async Task<IActionResult> Create([FromHeader] string? token, [FromBody] Account account, IFormFile[] files)
         {
-            
-            if (!IsValidateToken().Result)
+            if (!IsValidateToken(token).Result)
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             account.Family = account.Family.ToUpper();
@@ -65,8 +89,10 @@ namespace RegistrantApplication.Server.Controllers
         }
         
         [HttpGet("GetById")]
-        public IActionResult GetById(long idDriver)
+        public IActionResult GetById([FromHeader] string token, long idDriver)
         {
+            if (!IsValidateToken(token).Result)
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             var currentDriver = _ef.Accounts
                 .Include(x => x.Documents)
@@ -80,8 +106,11 @@ namespace RegistrantApplication.Server.Controllers
         }
         
         [HttpGet("Get")]
-        public IActionResult Get(string? search, long page, bool showEmployee, bool showDeleted)
+        public IActionResult Get([FromHeader] string? token, string? search, long page, bool showEmployee, bool showDeleted)
         {
+            if (!IsValidateToken(token).Result)
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+            
             if (page < 0)
                 return BadRequest(ConfigMsg.PaginationError);
 
@@ -132,27 +161,6 @@ namespace RegistrantApplication.Server.Controllers
 
             return Ok(view);
         }
-
-
-        [NonAction]
-        public static string ValidationNumber(string inpute)
-        {
-            if (string.IsNullOrEmpty(inpute))
-                return inpute;
-            
-            inpute = inpute.Replace(" ", string.Empty)
-                .Replace("+", string.Empty)
-                .Replace("(", string.Empty)
-                .Replace(")", string.Empty)
-                .Replace("-",string.Empty);
-
-            while (inpute[0].ToString() == "8" || inpute[0].ToString() == "7")
-            {
-                inpute = inpute.Substring(1);
-            }
-
-            return inpute;
-        }
-
+ 
     }
 }

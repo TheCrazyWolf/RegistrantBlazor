@@ -46,4 +46,17 @@ public class Accounts : BaseController
 
         return await _client.ExecuteAsync(request);
     }
+    
+    /// <summary>
+    /// Возращает текущую информацию о пользователе
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <returns></returns>
+    public async Task<RestResponse> GetAccountDetails(string token)
+    {
+        var request = new RestRequest(resource: $"{_urlController}/GetAccountDetails", method: Method.Get);
+        request.AddHeader("Token", token);
+
+        return await _client.ExecuteAsync(request);
+    }
 }

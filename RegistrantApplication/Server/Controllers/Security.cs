@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.Base;
+using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Accounts;
 using RegistrantApplication.Shared.API.Accounts;
@@ -17,65 +18,37 @@ public class Security : BaseApiController
     public Security(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
     {
     }
-
-    [HttpGet("GetAccountDetails")]
-    public async Task<IActionResult> GetAccountDetails()
-    {
-        if (!IsValidateToken().Result)
-            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-
-        if(_session == null)
-            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-        
-        AccountDetails details = new AccountDetails()
-        {
-            Family = _session.Account.Family.ToUpper(),
-            Name = _session.Account.Name.ToUpper(),
-            Patronymic = _session.Account.Patronymic?.ToUpper(),
-            IsEmployee = _session.Account.IsEmployee
-        };
-
-        return Ok(details);
-    }
-
-    [HttpGet("CreateTestAccount")]
-    public async Task<IActionResult> CreateTestAccount(string family, string name, string phone, string password, bool isEmployee)
-    {
-        Account account = new Account()
-        {
-            Family = family,
-            Name = name,
-            PasswordHash = GetMd5(password).Result,
-            PhoneNumber = phone,
-            IsEmployee = isEmployee
-        };
-        await _ef.AddAsync(account);
-        await _ef.SaveChangesAsync();
-        return Ok();
-    }
     
+    /// <summary>
+    /// Создание сесии и передача токена клиенту
+    /// </summary>
+    /// <param name="phone">Номер телефона как логин</param>
+    /// <param name="password">Пароль</param>
+    /// <param name="isEmployee">Указать вход как сотрудник?</param>
+    /// <returns>Возращает токен в случае успешной авторизации</returns>
     [HttpGet("GetToken")]
-    public async Task<IActionResult> GetToken(string phone, string? password, string? family, bool isEmployee)
+    public async Task<IActionResult> GetToken(string phone, string? password, bool isEmployee)
     {
         Account? foundAccount = null;
-        
+
         if (isEmployee)
         {
             foundAccount = await _ef.Accounts
                 .FirstOrDefaultAsync(x =>
-                    x.PhoneNumber.ToUpper() == Accounts.ValidationNumber(phone.ToUpper()) && GetMd5(password).Result == x.PasswordHash &&
+                    x.PhoneNumber.ToUpper() == MyValidator.ValidationNumber(phone) &&
+                    GetMd5(password).Result == x.PasswordHash &&
                     x.IsEmployee == true);
         }
-        
+
         if (foundAccount == null)
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-        
+
         var session = new Session()
         {
             Token = GetUnqueString().Result,
             Account = foundAccount,
             DateTimeSessionStarted = DateTime.Now,
-            DateTimeSessionExpired = DateTime.Now.AddDays(1)
+            DateTimeSessionExpired = DateTime.Now.AddHours(ConfigServer.AuthTokenLifeTimInHour)
         };
 
         var sessionResult = new SessionResult()
@@ -85,10 +58,49 @@ public class Security : BaseApiController
             DateTimeSessionExpired = session.DateTimeSessionExpired,
             IsEmployee = foundAccount.IsEmployee
         };
-        
+
         await _ef.AddAsync(session);
         await _ef.SaveChangesAsync();
         return Ok(sessionResult);
+    }
+
+    /// <summary>
+    /// Завершение текущей сессии
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="forceLogout">Принудительных выход везде</param>
+    /// <returns>200 - в случае успешного выхода</returns>
+    [HttpGet("Logout")]
+    public async Task<IActionResult> Logout([FromHeader] string token, bool forceLogout)
+    {
+        if (!IsValidateToken(token).Result)
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        var foundToken = await _ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
+
+        if (foundToken == null)
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        foundToken.DateTimeSessionExpired = DateTime.Now;
+        _ef.Update(foundToken);
+        await _ef.SaveChangesAsync();
+
+        if (!forceLogout)
+            return Ok();
+
+        var tokenAcitve = _ef.AccountsSessions
+            .Include(x => x.Account)
+            .Where(x => x.DateTimeSessionExpired >= DateTime.Now)
+            .ToList();
+
+        foreach (var tokenCurrent in tokenAcitve)
+        {
+            tokenCurrent.DateTimeSessionExpired = DateTime.Now;
+            _ef.Update(tokenCurrent);
+            await _ef.SaveChangesAsync();
+        }
+
+        return Ok();
     }
 
     [HttpPost("ResetToken")]
@@ -97,19 +109,20 @@ public class Security : BaseApiController
         foreach (var token in arrayTokens)
         {
             var foundToken = await _ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
-            
-            if(foundToken == null)
+
+            if (foundToken == null)
                 continue;
-            
-            foundToken.DateTimeSessionExpired = DateTime.Now;;
+
+            foundToken.DateTimeSessionExpired = DateTime.Now;
+            ;
             _ef.Update(foundToken);
             await _ef.SaveChangesAsync();
         }
 
         return Ok();
     }
-    
-    
+
+
     [NonAction]
     public static async Task<string> GetMd5(string input)
     {
@@ -136,7 +149,7 @@ public class Security : BaseApiController
     {
         await Task.Delay(0);
         char[] uniqString = (Guid.NewGuid() + Guid.NewGuid().ToString()).Replace("-", string.Empty).ToArray();
-        
+
         return new string(uniqString).ToString();
     }
 }

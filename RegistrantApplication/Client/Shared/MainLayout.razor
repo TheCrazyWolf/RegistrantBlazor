@@ -102,7 +102,7 @@
         if (lastSession == null)
             Navigation.NavigateTo("/security/action/login");
 
-        var responce = await Api.Security.GetAccountDetails(token: lastSession.Token);
+        var responce = await Api.Accounts.GetAccountDetails(token: lastSession.Token);
 
         if (responce.StatusCode == HttpStatusCode.Unauthorized)
             Navigation.NavigateTo("/security/action/login");

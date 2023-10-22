@@ -20,6 +20,6 @@ namespace RegistrantApplication.Shared.Orders
         public DateTime? DateTimeEndOrder { get; set; }
         public DateTime? DateTimeLeft { get; set; }
         
-        public OrderDetails OrderDetails { get; set; }
+        public required OrderDetails OrderDetails { get; set; }
     }
 }

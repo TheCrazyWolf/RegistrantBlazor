@@ -7,8 +7,8 @@ namespace RegistrantApplication.Shared.Accounts;
 public class Session
 {
     [Key]
-    public string Token { get; set; }
-    public Account Account { get; set; }
+    public required string Token { get; set; }
+    public required Account Account { get; set; }
     public DateTime DateTimeSessionStarted { get; set; }
     public DateTime DateTimeSessionExpired { get; set; }
     

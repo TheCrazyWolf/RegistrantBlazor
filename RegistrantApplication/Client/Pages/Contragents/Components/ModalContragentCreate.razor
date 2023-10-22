@@ -94,6 +94,7 @@
     {
         IsDisplay = true;
         await Task.Delay(1000);
+        StateHasChanged();
 
         PropertySmoothShowBackground = "ease-out duration-200 opacity-100";
         PropertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";

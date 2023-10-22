@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Accounts;
 using RegistrantApplication.Shared.API.Accounts;
@@ -94,7 +95,7 @@ public class Security : BaseController
     {
         foreach (var token in arrayTokens)
         {
-            var foundToken = await _ef.Sessions.FirstOrDefaultAsync(x => x.Token == token);
+            var foundToken = await _ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
             
             if(foundToken == null)
                 continue;

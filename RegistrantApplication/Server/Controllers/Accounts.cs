@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.API.View;
@@ -46,11 +47,11 @@ namespace RegistrantApplication.Server.Controllers
                     await file.CopyToAsync(fileStream);
                 }
                 
-                Document doc = new Document();
+                /*Document doc = new Document();
                 doc.Name = file.FileName;
-                doc.Data = System.IO.File.ReadAllBytes(fullPath);
+                doc.Data = System.IO.File.ReadAllBytes(fullPath);*/
                 
-                account.Documents.Add(doc);
+                /*account.Documents.Add(doc);*/
             }
             
 

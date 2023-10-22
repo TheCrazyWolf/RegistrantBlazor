@@ -137,10 +137,10 @@
     [Parameter][SupplyParameterFromQuery] public bool ShowDeleted { get; set; }
 
     /* Ответ из API */
-    protected ViewContragents? ViewData { get; set; } 
+    private ViewContragents? ViewData { get; set; } 
 
     /* Выбранные контрагенты */
-    public List<Contragent> SelectedContragents { get; set; } 
+    private List<Contragent> SelectedContragents { get; set; } 
 
     IModal modalContragentCreate;
     IModal modalContragentRemove;

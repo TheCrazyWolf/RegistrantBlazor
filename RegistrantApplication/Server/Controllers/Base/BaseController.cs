@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Accounts;
-using RegistrantApplication.Shared.Drivers;
 
-namespace RegistrantApplication.Server.Controllers
+namespace RegistrantApplication.Server.Controllers.Base
 {
     public class BaseController : ControllerBase
     {
@@ -34,7 +31,7 @@ namespace RegistrantApplication.Server.Controllers
             if (string.IsNullOrEmpty(tokenString))
                 return false;
 
-            _session = await _ef.Sessions
+            _session = await _ef.AccountsSessions
                 .Include(x => x.Account)
                 .FirstOrDefaultAsync(x => x.Token == tokenString && x.DateTimeSessionExpired >= DateTime.Now);
 

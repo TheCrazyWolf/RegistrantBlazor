@@ -7,7 +7,15 @@ namespace RegistrantApplication.Shared.Drivers
     {
         [Key]
         public long IdDocument { get; set; }
-        public string Name { get; set; }
-        public byte[] Data { get; set; }
+        public required string Title { get; set; }
+        
+        public string? Serial { get; set; } 
+        public string? Number { get; set; }
+        public DateOnly DateOfIssue { get; set; }
+        public string? Authority { get; set; }
+        
+        public FileDocument? FileDocument { get; set; }
+        
+        public bool IsDeleted { get; set; }
     }
 }

@@ -87,13 +87,13 @@
     public AccountDetails? AccountDetails { get; set; } = new AccountDetails();
 
 
-    /*protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         
         propertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
         StateHasChanged();
         
-        /*await Task.Delay(600);
+        await Task.Delay(600);
         propertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
         StateHasChanged();
 
@@ -107,13 +107,13 @@
         if (responce.StatusCode == HttpStatusCode.Unauthorized)
             Navigation.NavigateTo("/security/action/login", true);
 
-        AccountDetails = JsonConvert.DeserializeObject<AccountDetails>(responce.Content);#1#
+        AccountDetails = JsonConvert.DeserializeObject<AccountDetails>(responce.Content);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         
-    }*/
+    }
 
 
 }

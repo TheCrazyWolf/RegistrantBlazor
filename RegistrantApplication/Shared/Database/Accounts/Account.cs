@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using RegistrantApplication.Shared.Database.Drivers;
 
-namespace RegistrantApplication.Shared.Drivers
+namespace RegistrantApplication.Shared.Database.Accounts
 {
     public class Account
     {
@@ -13,8 +13,7 @@ namespace RegistrantApplication.Shared.Drivers
         public string? Patronymic { get; set; }
         [JsonIgnore] public string? PasswordHash { get; set; }
         public string? PhoneNumber { get; set; }
-        public List<Auto>? Autos { get; set; }
-        public List<Document>? Documents { get; set; }
+        public required AccountRole AccountRole { get; set; }
         public bool IsEmployee { get; set; }
         public bool IsDeleted { get; set; }
     }

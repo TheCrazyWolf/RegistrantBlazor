@@ -1,5 +1,5 @@
 ﻿using RegistrantApplication.ApiLibrary.Controllers.Base;
-using RegistrantApplication.Shared.Contragents;
+using RegistrantApplication.Shared.Database.Contragents;
 using RestSharp;
 
 namespace RegistrantApplication.ApiLibrary.Controllers

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RegistrantApplication.Shared.Drivers;
+using RegistrantApplication.Shared.Database.Accounts;
 
-namespace RegistrantApplication.Shared.Admin;
+namespace RegistrantApplication.Shared.Database.Admin;
 
 public class Event
 {

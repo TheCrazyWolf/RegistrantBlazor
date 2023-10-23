@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
-using RegistrantApplication.Server.Controllers.Base;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.Drivers;
+using RegistrantApplication.Shared.Database.Drivers;
 
 namespace RegistrantApplication.Server.Controllers;
 
@@ -26,19 +25,23 @@ public class Autos : BaseApiController
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] Auto auto)
     {
-        if (!IsValidateToken(token).Result)
+        if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var account = await _ef.Accounts
-            .Include(x => x.Autos)
+        if (session != null && !session.Account.AccountRole.CanCreateAuto)
+            return StatusCode(403, ConfigMsg.NotAllowed);
+        
+        var account = await Ef.Accounts
             .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
 
-        if (account?.Autos == null)
+        if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        account.Autos.Add(MyValidator.GetModel(auto));
-        _ef.Update(account);
-        await _ef.SaveChangesAsync();
+        auto = MyValidator.GetModel(auto);
+        auto.Account = account;
+
+        Ef.Add(auto);
+        await Ef.SaveChangesAsync();
         return Ok();
     }
 
@@ -47,21 +50,26 @@ public class Autos : BaseApiController
     /// </summary>
     /// <param name="token">Действующий токен</param>
     /// <param name="idAccount">ID аккаунта</param>
+    /// <param name="showDeleted">Показывать удаленных</param>
     /// <returns>Возращает коллекцию машин</returns>
     [HttpGet("Get")]
-    public async Task<IActionResult> Get([FromHeader] string token, long idAccount)
+    public async Task<IActionResult> Get([FromHeader] string token, long idAccount, bool showDeleted)
     {
-        if (!IsValidateToken(token).Result)
+        if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var account = await _ef.Accounts
-            .Include(x => x.Autos)
-            .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
+        if (session != null && !session.Account.AccountRole.CanViewAuto)
+            return StatusCode(403, ConfigMsg.NotAllowed);
 
-        if (account?.Autos == null)
+        var autoList =  Ef.AccountsAutos
+            .Include(x => x.Account)
+            .Where(x => x.Account != null && x.Account.IdAccount == idAccount && x.IsDeleted == showDeleted)
+            .ToList();
+
+        if (autoList == null)
             return NoContent();
 
-        return Ok(account.Autos.ToList());
+        return Ok(autoList);
     }
 
     /// <summary>
@@ -73,17 +81,20 @@ public class Autos : BaseApiController
     [HttpPut("Update")]
     public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Auto auto)
     {
-        if (!IsValidateToken(token).Result)
+        if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var foundAuto = await _ef.Autos
+        if (session != null && !session.Account.AccountRole.CanEditAuto)
+            return StatusCode(403, ConfigMsg.NotAllowed);
+
+        var foundAuto = await Ef.AccountsAutos
             .FirstOrDefaultAsync(x => x.IdAuto == auto.IdAuto);
 
         if (foundAuto == null)
             return NoContent();
         
-        _ef.Update(MyValidator.GetModel(foundAuto));
-        await _ef.SaveChangesAsync();
+        Ef.Update(MyValidator.GetModel(foundAuto));
+        await Ef.SaveChangesAsync();
         return Ok();
     }
     
@@ -96,20 +107,23 @@ public class Autos : BaseApiController
     [HttpDelete("Delete")]
     public async Task<IActionResult> Delete([FromHeader] string token, [FromBody]long[] idAutos)
     {
-        if (!IsValidateToken(token).Result)
+        if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        if (session != null && !session.Account.AccountRole.CanDeleteAuto)
+            return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idAutos)
         {
-            var foundAuto = await _ef.Autos
+            var foundAuto = await Ef.AccountsAutos
                 .FirstOrDefaultAsync(x => x.IdAuto == item);
             
             if(foundAuto == null)
                 continue;
 
             foundAuto.IsDeleted = true;
-            _ef.Update(foundAuto);
-            await _ef.SaveChangesAsync();
+            Ef.Update(foundAuto);
+            await Ef.SaveChangesAsync();
         }
 
         return Ok();

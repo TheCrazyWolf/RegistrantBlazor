@@ -2,8 +2,8 @@
 
 @using RegistrantApplication.ApiLibrary;
 @using RegistrantApplication.Shared.API.Accounts
-@using RegistrantApplication.Shared.Contragents;
 @using Blazored.LocalStorage
+@using RegistrantApplication.Shared.Database.Contragents
 
 @inject RApi Api;
 @inject ISyncLocalStorageService Storage;
@@ -67,7 +67,7 @@
     
     public ModalContragentCreate()
     {
-        Contragent = new Contragent();
+        //Contragent = new Contragent();
         PropertyErrorMsg = "";
         IdModal = new Random().Next().ToString();
         IsDisplay = false;

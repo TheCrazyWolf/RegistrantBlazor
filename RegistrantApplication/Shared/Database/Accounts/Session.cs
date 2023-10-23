@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using RegistrantApplication.Shared.Drivers;
+using System.Text.Json.Serialization;
 
-namespace RegistrantApplication.Shared.Accounts;
+namespace RegistrantApplication.Shared.Database.Accounts;
 
 public class Session
 {
     [Key]
     public required string Token { get; set; }
-    public required Account Account { get; set; }
+    [JsonIgnore] public Account Account { get; set; }
     public DateTime DateTimeSessionStarted { get; set; }
     public DateTime DateTimeSessionExpired { get; set; }
     

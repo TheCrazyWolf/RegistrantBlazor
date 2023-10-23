@@ -1,5 +1,4 @@
 ﻿using RegistrantApplication.ApiLibrary.Controllers.Base;
-using RegistrantApplication.Shared.Drivers;
 using RestSharp;
 
 namespace RegistrantApplication.ApiLibrary.Controllers;

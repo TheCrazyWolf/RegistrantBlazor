@@ -1,5 +1,5 @@
 ﻿using RegistrantApplication.Shared.API.View;
-using RegistrantApplication.Shared.Contragents;
+using RegistrantApplication.Shared.Database.Contragents;
 
 namespace RegistrantApplication.Shared.API
 {

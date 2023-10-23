@@ -1,5 +1,4 @@
 ﻿using RegistrantApplication.ApiLibrary.Controllers;
-using RegistrantApplication.Shared.Drivers;
 
 namespace RegistrantApplication.ApiLibrary
 {

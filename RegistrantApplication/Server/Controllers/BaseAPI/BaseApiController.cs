@@ -1,61 +1,41 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.Accounts;
+using RegistrantApplication.Shared.Database.Accounts;
 
-namespace RegistrantApplication.Server.Controllers.Base
+namespace RegistrantApplication.Server.Controllers.BaseAPI
 {
     public class BaseApiController : ControllerBase
     {
         protected readonly ILogger<BaseApiController> _logger;
-        protected readonly LiteContext _ef;
-        protected Session? _session;
+        protected readonly LiteContext Ef;
         
         public BaseApiController(ILogger<BaseApiController> logger, LiteContext ef)
         {
             _logger = logger;
-            _ef = ef;
-        }
-        
-        
-        /// <summary>
-        /// Валидация текущего токена
-        /// </summary>
-        /// <param name="token">Токен для проверки валидации</param>
-        /// <returns>Булевое знание - Валиден/Нет</returns>
-        protected async Task<bool> IsValidateToken()
-        {
-            Request.Headers.TryGetValue("Token", out var values);
-            string tokenString = values.ToString();
-            
-            if (string.IsNullOrEmpty(tokenString))
-                return false;
-
-            _session = await _ef.AccountsSessions
-                .Include(x => x.Account)
-                .FirstOrDefaultAsync(x => x.Token == tokenString && x.DateTimeSessionExpired >= DateTime.Now);
-
-            if (_session == null)
-                return false;
-            
-            return true;
+            Ef = ef;
         }
         
         /// <summary>
         /// Валидация текущего токена
         /// </summary>
         /// <param name="token">Токен для проверки валидации</param>
+        /// <param name="session"></param>
         /// <returns>Булевое знание - Валиден/Нет</returns>
-        protected async Task<bool> IsValidateToken(string token)
+        protected bool IsValidateToken(string token, out Session? session)
         {
             if (string.IsNullOrEmpty(token))
+            {
+                session = null;
                 return false;
+            }
 
-            _session = await _ef.AccountsSessions
+            session =  Ef?.AccountsSessions
                 .Include(x => x.Account)
-                .FirstOrDefaultAsync(x => x.Token == token && x.DateTimeSessionExpired >= DateTime.Now);
+                .Include(x => x.Account.AccountRole)
+                .FirstOrDefault(x => x.Token == token && x.DateTimeSessionExpired >= DateTime.Now);
 
-            if (_session == null)
+            if (session == null)
                 return false;
             
             return true;

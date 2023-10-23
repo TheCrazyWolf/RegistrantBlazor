@@ -1,4 +1,4 @@
-﻿@using RegistrantApplication.Shared.Drivers
+﻿@using RegistrantApplication.Shared.Database.Accounts
 @implements RegistrantApplication.Shared.IModal
 
 @if (IsDisplay)
@@ -169,7 +169,7 @@
 
     public ModalAccountCreate()
     {
-        Account = new Account { Family = "", Name = "" };
+        //Account = new Account { Family = "", Name = "" };
         PropertyErrorMsg = "";
         IdModal = new Random().Next().ToString();
         IsDisplay = false;

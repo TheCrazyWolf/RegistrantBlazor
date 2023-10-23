@@ -1,8 +1,10 @@
-﻿using RegistrantApplication.Shared.Contragents;
-using RegistrantApplication.Shared.Drivers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using RegistrantApplication.Shared.Database.Accounts;
+using RegistrantApplication.Shared.Database.Contragents;
+using RegistrantApplication.Shared.Database.Drivers;
+using RegistrantApplication.Shared.Orders;
 
-namespace RegistrantApplication.Shared.Orders
+namespace RegistrantApplication.Shared.Database.Orders
 {
     public class Order
     {

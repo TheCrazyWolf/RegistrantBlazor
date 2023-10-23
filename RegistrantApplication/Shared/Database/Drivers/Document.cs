@@ -1,7 +1,8 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using RegistrantApplication.Shared.Database.Accounts;
 
-namespace RegistrantApplication.Shared.Drivers
+namespace RegistrantApplication.Shared.Database.Drivers
 {
     public class Document
     {
@@ -13,6 +14,7 @@ namespace RegistrantApplication.Shared.Drivers
         public string? Number { get; set; }
         public DateOnly DateOfIssue { get; set; }
         public string? Authority { get; set; }
+        public Account? Account { get; set; }
         
         public FileDocument? FileDocument { get; set; }
         

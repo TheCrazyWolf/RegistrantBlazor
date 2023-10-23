@@ -4,6 +4,7 @@ public static class ConfigMsg
 {
     /* SECURITY */
     public const string UnauthorizedInvalidToken = "Срок действия токена истёк. Обратитесь к сис.админу";
+    public const string NotAllowed = "Метод на разрешен. Обратитесь к сис.админу";
 
     /* PAGINATION  */
     public const string PaginationError = "Текущая страница за пределами диапозона. Обратитесь к сис.админу";

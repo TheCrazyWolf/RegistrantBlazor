@@ -1,6 +1,4 @@
-﻿using RegistrantApplication.Shared.Contragents;
-
-namespace RegistrantApplication.Shared;
+﻿namespace RegistrantApplication.Shared;
 
 public interface IModal
 {

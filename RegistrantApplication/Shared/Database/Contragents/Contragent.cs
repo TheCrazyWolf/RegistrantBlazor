@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RegistrantApplication.Shared.Contragents
+namespace RegistrantApplication.Shared.Database.Contragents
 {
     public class Contragent
     {
         [Key]
         public long IdContragent { get; set; }
-        public string Title { get; set; }
+        public required string Title { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public bool IsDeleted { get; set; }
     }

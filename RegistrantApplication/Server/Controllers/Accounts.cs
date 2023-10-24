@@ -43,7 +43,7 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanCreateAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
-            if ((session.Account.AccountRole != null && session != null) &&  (session.Account.AccountRole == null || !session.Account.AccountRole.CanEditRoles))
+            if(!session.Account.AccountRole.CanChangeRoles)
                 account.AccountRole = await Ef.AccountRoles.FirstOrDefaultAsync(x => x.IsDefault == true);
             
             account = MyValidator.GetModel(account);

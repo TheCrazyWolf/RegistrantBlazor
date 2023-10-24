@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using RegistrantApplication.Shared.Database.Drivers;
 
 namespace RegistrantApplication.Shared.Database.Accounts
 {
@@ -13,7 +12,7 @@ namespace RegistrantApplication.Shared.Database.Accounts
         public string? Patronymic { get; set; }
         [JsonIgnore] public string? PasswordHash { get; set; }
         public string? PhoneNumber { get; set; }
-        public required AccountRole AccountRole { get; set; }
+        [JsonIgnore] public AccountRole AccountRole { get; set; }
         public bool IsEmployee { get; set; }
         public bool IsDeleted { get; set; }
     }

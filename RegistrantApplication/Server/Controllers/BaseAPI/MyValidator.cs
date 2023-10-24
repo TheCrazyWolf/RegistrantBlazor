@@ -91,5 +91,10 @@ public static class MyValidator
 
         return new string(uniqString).ToString();
     }
-    
+
+    public static AccountRole GetModel(AccountRole contragent)
+    {
+        contragent.Title = contragent.Title.ToUpper();
+        return contragent;
+    }
 }

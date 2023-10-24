@@ -17,6 +17,12 @@ public class AccountRole
     public bool CanChangeRole { get; set; }
     public bool CanDeleteAccount { get; set; }
 
+    
+    public bool CanViewRoles { get; set; }
+    public bool CanCreateRoles { get; set; }
+    public bool CanEditRoles { get; set; }
+    public bool CanDeleteRoles { get; set; }
+    
     public bool CanViewAuto { get; set; }
     public bool CanCreateAuto { get; set; }
     public bool CanEditAuto{ get; set; }

@@ -206,7 +206,7 @@ namespace RegistrantApplication.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("RegistrantApplication.Shared.Database.Accounts.Session", b =>
+            modelBuilder.Entity("RegistrantApplication.Shared.Database.Accounts.AccountSession", b =>
                 {
                     b.Property<string>("Token")
                         .HasColumnType("TEXT");
@@ -299,6 +299,7 @@ namespace RegistrantApplication.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("IdAuto");
@@ -364,7 +365,7 @@ namespace RegistrantApplication.Server.Migrations
 
                     b.HasKey("IdFile");
 
-                    b.ToTable("AccountsFileDocuments");
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("RegistrantApplication.Shared.Database.Orders.Order", b =>
@@ -475,7 +476,7 @@ namespace RegistrantApplication.Server.Migrations
                     b.Navigation("AccountRole");
                 });
 
-            modelBuilder.Entity("RegistrantApplication.Shared.Database.Accounts.Session", b =>
+            modelBuilder.Entity("RegistrantApplication.Shared.Database.Accounts.AccountSession", b =>
                 {
                     b.HasOne("RegistrantApplication.Shared.Database.Accounts.Account", "Account")
                         .WithMany()

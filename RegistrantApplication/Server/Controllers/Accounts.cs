@@ -31,9 +31,15 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanLogin)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
-            return Ok(MyValidator.GetModel(session?.Account));
+            return Ok(session.Account);
         }
 
+        /// <summary>
+        /// Создает новый аккаунт
+        /// </summary>
+        /// <param name="token">Валидный токен</param>
+        /// <param name="account">Аккаунт</param>
+        /// <returns></returns>
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromHeader] string token, [FromBody] Account account)
         {
@@ -43,14 +49,51 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanCreateAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
+            if (Ef.Accounts.Any(x =>
+                    x.PhoneNumber == MyValidator.ValidationNumber(account.PhoneNumber) && x.IsDeleted == false))
+                return BadRequest("Этот объект уже существует");
+
             if(!session.Account.AccountRole.CanChangeRoles)
                 account.AccountRole = await Ef.AccountRoles.FirstOrDefaultAsync(x => x.IsDefault == true);
             
-            account = MyValidator.GetModel(account);
+            account = MyValidator.GetModel(new Account(), account);
             account.PasswordHash = string.IsNullOrEmpty(account.PasswordHash) ? null : await MyValidator.GetMd5(account.PasswordHash);
             account.IsDeleted = false;
             
             await Ef.AddAsync(account);
+            await Ef.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPut("Update")]
+        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Account account)
+        {
+            if (!IsValidateToken(token, out var session))
+                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+            if (session != null && !session.Account.AccountRole.CanEditAccount)
+                return StatusCode(403, ConfigMsg.NotAllowed);
+
+            var foundAccount = await Ef.Accounts
+                .Include(x=> x.AccountRole)
+                .FirstOrDefaultAsync(x => x.IdAccount == account.IdAccount);
+
+            if (foundAccount == null)
+                return NotFound(ConfigMsg.ValidationElementNotFound);
+            
+            if(foundAccount.PhoneNumber != MyValidator.ValidationNumber(account.PhoneNumber))
+                if(Ef.Accounts.Any(x=> x.PhoneNumber == MyValidator.ValidationNumber(account.PhoneNumber) && x.IsDeleted == false))
+                    return BadRequest("Этот объект уже существует");
+            
+            foundAccount = MyValidator.GetModel(foundAccount, account);
+            if (session != null && !session.Account.AccountRole.CanChangeRoles)
+                foundAccount.AccountRole = account.AccountRole;
+            
+            if(!string.IsNullOrEmpty(account.PasswordHash))
+                foundAccount.PasswordHash = string.IsNullOrEmpty(account.PasswordHash) ? null : await MyValidator.GetMd5(account.PasswordHash);
+
+            Ef.Update(foundAccount);
             await Ef.SaveChangesAsync();
 
             return Ok();

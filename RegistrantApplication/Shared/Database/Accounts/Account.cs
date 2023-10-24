@@ -7,8 +7,8 @@ namespace RegistrantApplication.Shared.Database.Accounts
     {
         [Key]
         public long IdAccount { get; set; }
-        public required string Family { get; set; }
-        public required string Name { get; set; }
+        public string Family { get; set; }
+        public string Name { get; set; }
         public string? Patronymic { get; set; }
         [JsonIgnore] public string? PasswordHash { get; set; }
         public string? PhoneNumber { get; set; }

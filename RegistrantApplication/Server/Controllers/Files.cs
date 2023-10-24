@@ -29,7 +29,7 @@ public class Files : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var document = await Ef.AccountsFileDocuments
+        var document = await Ef.Files
             .FirstOrDefaultAsync(x => x.IdFile == idDocument);
         
         if (document == null)

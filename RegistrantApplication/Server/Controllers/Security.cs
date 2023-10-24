@@ -20,9 +20,10 @@ public class Security : BaseApiController
     /// </summary>
     /// <param name="phone">Номер телефона как логин</param>
     /// <param name="password">Пароль</param>
+    /// <param name="fingerPrinetBrowser"></param>
     /// <returns>Возращает токен в случае успешной авторизации</returns>
     [HttpGet("GetToken")]
-    public async Task<IActionResult> GetToken(string phone, string? password)
+    public async Task<IActionResult> GetToken(string phone, string? password, string? fingerPrintBrowser)
     {
         var foundAccount = await Ef.Accounts
             .Include(x=> x.AccountRole)
@@ -38,12 +39,13 @@ public class Security : BaseApiController
         if(!foundAccount.AccountRole.CanLogin)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
-        var session = new Session()
+        var session = new AccountSession()
         {
             Token = await MyValidator.GetUnqueStringForToken(),
             Account = foundAccount,
             DateTimeSessionStarted = DateTime.Now,
-            DateTimeSessionExpired = DateTime.Now.AddHours(ConfigSrv.AuthTokenLifeTimInHour)
+            DateTimeSessionExpired = DateTime.Now.AddHours(ConfigSrv.AuthTokenLifeTimInHour),
+            FingerPrintIdentity = fingerPrintBrowser
         };
 
         await Ef.AddAsync(session);

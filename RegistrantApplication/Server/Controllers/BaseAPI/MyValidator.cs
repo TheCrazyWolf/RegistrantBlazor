@@ -17,15 +17,16 @@ public static class MyValidator
         return auto;
     }
 
-    public static Account GetModel(Account account)
+    public static Account GetModel(Account accountEntity, Account tobeMoved)
     {
-        account.Family = account.Family.ToUpper();
-        account.Name = account.Name.ToUpper();
-        account.Patronymic = account.Patronymic?.ToUpper();
-        account.PhoneNumber = string.IsNullOrEmpty(account.PhoneNumber) ? null : ValidationNumber(account.PhoneNumber);
+        accountEntity.Family = tobeMoved.Family.ToUpper();
+        accountEntity.Name = tobeMoved.Name.ToUpper();
+        accountEntity.Patronymic = tobeMoved.Patronymic?.ToUpper();
+        accountEntity.PhoneNumber = string.IsNullOrEmpty(tobeMoved.PhoneNumber) ? null : ValidationNumber(tobeMoved.PhoneNumber);
 
-        return account;
+        return accountEntity;
     }
+    
 
     public static Contragent GetModel(Contragent contragent)
     {

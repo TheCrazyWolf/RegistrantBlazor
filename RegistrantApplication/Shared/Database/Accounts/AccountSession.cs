@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace RegistrantApplication.Shared.Database.Accounts;
 
-public class Session
+public class AccountSession
 {
     [Key]
     public required string Token { get; set; }

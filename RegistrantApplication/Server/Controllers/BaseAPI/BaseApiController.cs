@@ -22,7 +22,7 @@ namespace RegistrantApplication.Server.Controllers.BaseAPI
         /// <param name="token">Токен для проверки валидации</param>
         /// <param name="session"></param>
         /// <returns>Булевое знание - Валиден/Нет</returns>
-        protected bool IsValidateToken(string token, out Session? session)
+        protected bool IsValidateToken(string token, out AccountSession? session)
         {
             if (string.IsNullOrEmpty(token))
             {

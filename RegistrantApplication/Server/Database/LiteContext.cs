@@ -11,14 +11,14 @@ namespace RegistrantApplication.Server.Database
     public sealed class LiteContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Session> AccountsSessions { get; set; }
+        public DbSet<AccountSession> AccountsSessions { get; set; }
         public DbSet<AccountRole> AccountRoles { get; set; }
-        public DbSet<FileDocument> AccountsFileDocuments { get; set; }
         public DbSet<Auto> AccountsAutos { get; set; }
         public DbSet<Document> AccountsDocuments { get; set; }
         public DbSet<Contragent> Contragents { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<FileDocument> Files { get; set; }
         public DbSet<Event> Events { get; set; }
 
         public LiteContext()

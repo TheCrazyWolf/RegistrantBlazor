@@ -96,7 +96,7 @@ namespace RegistrantApplication.Server.Migrations
                     Patronymic = table.Column<string>(type: "TEXT", nullable: true),
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    AccountRoleIdRole = table.Column<long>(type: "INTEGER", nullable: false),
+                    AccountRoleIdRole = table.Column<long>(type: "INTEGER", nullable: true),
                     IsEmployee = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
@@ -117,7 +117,7 @@ namespace RegistrantApplication.Server.Migrations
                 {
                     IdAuto = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
                     AutoNumber = table.Column<string>(type: "TEXT", nullable: false),
                     AccountIdAccount = table.Column<long>(type: "INTEGER", nullable: true),
                     IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
@@ -254,7 +254,8 @@ namespace RegistrantApplication.Server.Migrations
                     DateTimeStartOrder = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DateTimeEndOrder = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DateTimeLeft = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    OrderDetailsIdOrderDetails = table.Column<long>(type: "INTEGER", nullable: false)
+                    OrderDetailIdOrderDetails = table.Column<long>(type: "INTEGER", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -278,8 +279,8 @@ namespace RegistrantApplication.Server.Migrations
                         principalColumn: "IdContragent",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_OrderDetails_OrderDetailsIdOrderDetails",
-                        column: x => x.OrderDetailsIdOrderDetails,
+                        name: "FK_Orders_OrderDetails_OrderDetailIdOrderDetails",
+                        column: x => x.OrderDetailIdOrderDetails,
                         principalTable: "OrderDetails",
                         principalColumn: "IdOrderDetails",
                         onDelete: ReferentialAction.Restrict);
@@ -341,9 +342,9 @@ namespace RegistrantApplication.Server.Migrations
                 column: "ContragentIdContragent");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_OrderDetailsIdOrderDetails",
+                name: "IX_Orders_OrderDetailIdOrderDetails",
                 table: "Orders",
-                column: "OrderDetailsIdOrderDetails");
+                column: "OrderDetailIdOrderDetails");
         }
 
         /// <inheritdoc />

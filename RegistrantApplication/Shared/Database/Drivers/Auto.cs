@@ -7,7 +7,7 @@ namespace RegistrantApplication.Shared.Database.Drivers
     {
         [Key]
         public long IdAuto { get; set; }
-        public required string? Title { get; set; }
+        public required string Title { get; set; }
         public required string AutoNumber { get; set; }
         public Account? Account { get; set; }
         public bool IsDeleted { get; set; }

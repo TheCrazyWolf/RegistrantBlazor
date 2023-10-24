@@ -6,7 +6,6 @@ using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Accounts;
-using RegistrantApplication.Shared.Database.Drivers;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -41,8 +40,11 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanCreateAccount)
+            if (session != null && !session.Account.AccountRole.CanCreateAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
+
+            if ((session.Account.AccountRole != null && session != null) &&  (session.Account.AccountRole == null || !session.Account.AccountRole.CanEditRoles))
+                account.AccountRole = await Ef.AccountRoles.FirstOrDefaultAsync(x => x.IsDefault == true);
             
             account = MyValidator.GetModel(account);
             account.PasswordHash = string.IsNullOrEmpty(account.PasswordHash) ? null : await MyValidator.GetMd5(account.PasswordHash);
@@ -60,8 +62,8 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanViewAccount)
-            return StatusCode(403, ConfigMsg.NotAllowed);
+            if (session != null && !session.Account.AccountRole.CanViewAccounts)
+                return StatusCode(403, ConfigMsg.NotAllowed);
 
             var currentDriver = Ef.Accounts
                 .FirstOrDefault(x => x.IdAccount == idDriver);
@@ -78,16 +80,16 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanViewAccount)
+            if (session != null && !session.Account.AccountRole.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             if (page < 0)
                 return BadRequest(ConfigMsg.PaginationError);
 
             long totalRecords = Ef.Accounts
-                .Where(x => x.IsDeleted == showDeleted && x.IsEmployee== showEmployee).Count();
+                .Count(x => x.IsDeleted == showDeleted && x.IsEmployee== showEmployee);
 
-            long totalPages = totalRecords / ConfigServer.RecordsByPage;
+            long totalPages = totalRecords / ConfigSrv.RecordsByPage;
 
             if (page > totalPages)
                 return BadRequest(ConfigMsg.PaginationError);
@@ -99,10 +101,10 @@ namespace RegistrantApplication.Server.Controllers
                 data = Ef.Accounts
                      .OrderBy(x => x.IdAccount)
                      .Where(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee)
-                     .Skip((int)(page * ConfigServer.RecordsByPage))
-                     .Take((int)ConfigServer.RecordsByPage)
+                     .Skip((int)(page * ConfigSrv.RecordsByPage))
+                     .Take((int)ConfigSrv.RecordsByPage)
                      .ToList();
-                totalRecords = Ef.Accounts.Where(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee).Count();
+                totalRecords = Ef.Accounts.Count(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee);
             }
             else
             {
@@ -110,14 +112,14 @@ namespace RegistrantApplication.Server.Controllers
                     .OrderBy(x => x.IdAccount)
                     .Where(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) 
                                 && x.Family.ToUpper().Contains(search.ToUpper()))
-                    .Skip((int)(page * ConfigServer.RecordsByPage))
-                    .Take((int)ConfigServer.RecordsByPage)
+                    .Skip((int)(page * ConfigSrv.RecordsByPage))
+                    .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
 
                 totalRecords = 
                     Ef.Accounts.Count(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) && x.Family.ToUpper()
                         .Contains(search.ToUpper()));
-                totalPages = totalRecords / ConfigServer.RecordsByPage;
+                totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
 
             IViewAPI view = new ViewAccounts()
@@ -126,7 +128,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalPages = totalPages,
                 CurrentPage = page,
                 Accounts = data,
-                MaxRecordsOnPageConst = ConfigServer.RecordsByPage
+                MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
 
             return Ok(view);

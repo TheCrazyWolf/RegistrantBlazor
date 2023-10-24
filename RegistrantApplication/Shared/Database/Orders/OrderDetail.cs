@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using RegistrantApplication.Shared.Database.Accounts;
 
-namespace RegistrantApplication.Shared.Orders
+namespace RegistrantApplication.Shared.Database.Orders
 {
-    public class OrderDetails
+    public class OrderDetail
     {
         [Key]
         public long IdOrderDetails { get; set; }

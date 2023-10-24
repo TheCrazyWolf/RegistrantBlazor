@@ -43,7 +43,7 @@ public class Security : BaseApiController
             Token = await MyValidator.GetUnqueStringForToken(),
             Account = foundAccount,
             DateTimeSessionStarted = DateTime.Now,
-            DateTimeSessionExpired = DateTime.Now.AddHours(ConfigServer.AuthTokenLifeTimInHour)
+            DateTimeSessionExpired = DateTime.Now.AddHours(ConfigSrv.AuthTokenLifeTimInHour)
         };
 
         await Ef.AddAsync(session);
@@ -63,7 +63,8 @@ public class Security : BaseApiController
         if (!IsValidateToken(token, out _))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var foundToken = await Ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
+        var foundToken = await Ef.AccountsSessions
+            .FirstOrDefaultAsync(x => x.Token == token);
 
         if (foundToken == null)
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -90,6 +91,35 @@ public class Security : BaseApiController
         return Ok();
     }
 
+    /// <summary>
+    /// Смена пароля текущего аккаунта
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="oldPassword">Нехешированный старый пароль</param>
+    /// <param name="newPassword">Нехешированный новый пароль</param>
+    /// <param name="newPassword2">Нехешированный новый пароль второй раз</param>
+    /// <returns></returns>
+    [HttpGet("ChangePassword")]
+    public async Task<IActionResult> ChangePassword([FromHeader] string token, string oldPassword, string newPassword,
+        string newPassword2)
+    {
+        if (!IsValidateToken(token, out var session))
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        if (session?.Account.PasswordHash != await MyValidator.GetMd5(oldPassword))
+            return BadRequest("Старый пароль не совпадает с новым");
+        
+        if(newPassword != newPassword2)
+            return BadRequest("Новый пароль не повторятся правильно");
+
+        session.Account.PasswordHash = await MyValidator.GetMd5(newPassword);
+        Ef.Update(session.Account);
+        await Ef.SaveChangesAsync();
+
+        return Ok();
+    }
+    
+    
     [HttpPost("ResetToken")]
     public async Task<IActionResult> ResetToken([FromBody] string[] arrayTokens)
     {

@@ -5,7 +5,6 @@ using RegistrantApplication.Shared.Database.Admin;
 using RegistrantApplication.Shared.Database.Contragents;
 using RegistrantApplication.Shared.Database.Drivers;
 using RegistrantApplication.Shared.Database.Orders;
-using RegistrantApplication.Shared.Orders;
 
 namespace RegistrantApplication.Server.Database
 {
@@ -19,7 +18,7 @@ namespace RegistrantApplication.Server.Database
         public DbSet<Document> AccountsDocuments { get; set; }
         public DbSet<Contragent> Contragents { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderDetails> OrderDetails { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Event> Events { get; set; }
 
         public LiteContext()
@@ -29,7 +28,7 @@ namespace RegistrantApplication.Server.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(ConfigServer.ConnectionString);
+            optionsBuilder.UseSqlite(ConfigSrv.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

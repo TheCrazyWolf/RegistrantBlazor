@@ -9,9 +9,9 @@ namespace RegistrantApplication.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class Role : BaseApiController
+public class Roles : BaseApiController
 {
-    public Role(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    public Roles(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
     {
     }
 
@@ -114,6 +114,7 @@ public class Role : BaseApiController
     /// <param name="token">Валидиный токен</param>
     /// <param name="role">Роль с правами</param>
     /// <returns>Возращает 200 - если все хорошо</returns>
+    [HttpPut("Update")]
     public async Task<IActionResult> Update([FromHeader] string token, AccountRole role)
     {
         if (!IsValidateToken(token, out var session))
@@ -153,7 +154,6 @@ public class Role : BaseApiController
         }
         
         await Ef.SaveChangesAsync();
-
         return Ok();
     }
     

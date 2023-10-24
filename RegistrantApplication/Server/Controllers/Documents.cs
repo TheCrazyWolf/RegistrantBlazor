@@ -15,13 +15,21 @@ public class Documents : BaseApiController
     {
     }
 
+    /// <summary>
+    /// Создать документ
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="idAccount">ID аккаунта для которого создается документ</param>
+    /// <param name="document">Содержимое документа</param>
+    /// <param name="file">Загрузка файла</param>
+    /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] Document document, [FromForm] IFormFile? file)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateDocument)
+        if (session != null && !session.Account.AccountRole.CanCreateDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAccount = await Ef.Accounts
@@ -40,13 +48,19 @@ public class Documents : BaseApiController
     }
 
     
+    /// <summary>
+    /// Обновление документа
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="document">Содержимое документа</param>
+    /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPut("Update")]
     public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Document document)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanEditDocument)
+        if (session != null && !session.Account.AccountRole.CanEditDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundDocument = await Ef.AccountsDocuments
@@ -65,13 +79,19 @@ public class Documents : BaseApiController
 
     }
 
+    /// <summary>
+    /// Удаляет документ из системы
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="idsDocuments">Массив ID документов для удаления</param>
+    /// <returns>Возращает 200 - если документ успешно удален</returns>
     [HttpDelete("Delete")]
     public async Task<IActionResult> Delete([FromHeader] string token, long[] idsDocuments)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanDeleteDocument)
+        if (session != null && !session.Account.AccountRole.CanDeleteDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idsDocuments)
@@ -90,13 +110,20 @@ public class Documents : BaseApiController
         return Ok();
     }
 
+    /// <summary>
+    /// Получть документы пользователя
+    /// </summary>
+    /// <param name="token">Валидный токен</param>
+    /// <param name="idAccount">ID аккаунта, которого получаем документы</param>
+    /// <param name="showDeleted">Показывать удаленные документы</param>
+    /// <returns>Массив документов</returns>
     [HttpGet("GetDocuments")]
-    public async Task<IActionResult> Get([FromHeader] string token, long idAccount, bool showDeleted)
+    public async Task<IActionResult> GetDocuments([FromHeader] string token, long idAccount, bool showDeleted)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanViewDocument)
+        if (session != null && !session.Account.AccountRole.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var documents = Ef.AccountsDocuments
@@ -111,26 +138,5 @@ public class Documents : BaseApiController
 
     }
 
-    [HttpGet("GetFile")]
-    public async Task<IActionResult> GetFile([FromHeader] string token, long idDocument)
-    {
-        if (!IsValidateToken(token, out var session))
-            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-
-        if (session != null && !session.Account.AccountRole.CanViewDocument)
-            return StatusCode(403, ConfigMsg.NotAllowed);
-
-        var document = await Ef.AccountsFileDocuments
-            .FirstOrDefaultAsync(x => x.IdFile == idDocument);
-        
-        if (document == null)
-            return NotFound(ConfigMsg.ValidationElementNotFound);
-
-        var file = new FileContentResult(document.DataBytes, "application/octet-stream")
-        {
-            FileDownloadName = document.FileName
-        };
-
-        return file;
-    }
+    
 }

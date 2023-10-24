@@ -1,6 +1,8 @@
 ﻿using RegistrantApplication.Shared.Database.Accounts;
+using RegistrantApplication.Shared.Database.Admin;
 using RegistrantApplication.Shared.Database.Contragents;
 using RegistrantApplication.Shared.Database.Drivers;
+using RegistrantApplication.Shared.Database.Orders;
 
 namespace RegistrantApplication.Server.Controllers.BaseAPI;
 
@@ -39,6 +41,37 @@ public static class MyValidator
         return document;
     }
 
+    public static AccountRole GetModel(AccountRole role)
+    {
+        role.Title = role.Title.ToUpper();
+        return role;
+    }
+
+    public static Event GetModel(Event @event)
+    {
+        @event.DateTimeEvent = DateTime.Now;
+        return @event;
+    }
+
+    public static Order GetModel(Order order)
+    {
+        return order;
+    }
+
+    public static OrderDetail GetModel(OrderDetail orderDetails)
+    {
+        orderDetails.NumRealese = orderDetails.NumRealese?.ToUpper();
+        orderDetails.CountPodons = orderDetails.CountPodons?.ToUpper();
+        orderDetails.TochkaLoad = orderDetails.CountPodons?.ToUpper();
+        orderDetails.PacketDocuments = orderDetails.PacketDocuments?.ToUpper();
+        orderDetails.TochkaLoad = orderDetails.TochkaLoad?.ToUpper();
+        orderDetails.Nomenclature = orderDetails.Nomenclature?.ToUpper();
+        orderDetails.Size = orderDetails.Size?.ToUpper();
+        orderDetails.TypeLoad = orderDetails.TochkaLoad?.ToUpper();
+        orderDetails.Description = orderDetails.Description?.ToUpper();
+
+        return orderDetails;
+    }
 
     public static string ValidationNumber(string number)
     {
@@ -91,10 +124,5 @@ public static class MyValidator
 
         return new string(uniqString).ToString();
     }
-
-    public static AccountRole GetModel(AccountRole contragent)
-    {
-        contragent.Title = contragent.Title.ToUpper();
-        return contragent;
-    }
+    
 }

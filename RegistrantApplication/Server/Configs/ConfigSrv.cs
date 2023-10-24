@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Server.Configs;
 
-public static class ConfigServer
+public static class ConfigSrv
 {
     public const long RecordsByPage = 10;
     public const long AuthTokenLifeTimInHour  = 4;

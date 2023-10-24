@@ -28,7 +28,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateAuto)
+        if (session != null && !session.Account.AccountRole.CanCreateAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
         var account = await Ef.Accounts
@@ -58,7 +58,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanViewAuto)
+        if (session != null && !session.Account.AccountRole.CanViewAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var autoList =  Ef.AccountsAutos
@@ -84,7 +84,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanEditAuto)
+        if (session != null && !session.Account.AccountRole.CanEditAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAuto = await Ef.AccountsAutos
@@ -110,7 +110,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanDeleteAuto)
+        if (session != null && !session.Account.AccountRole.CanDeleteAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idAutos)

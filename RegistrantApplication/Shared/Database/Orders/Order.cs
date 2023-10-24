@@ -2,7 +2,6 @@
 using RegistrantApplication.Shared.Database.Accounts;
 using RegistrantApplication.Shared.Database.Contragents;
 using RegistrantApplication.Shared.Database.Drivers;
-using RegistrantApplication.Shared.Orders;
 
 namespace RegistrantApplication.Shared.Database.Orders
 {
@@ -22,6 +21,8 @@ namespace RegistrantApplication.Shared.Database.Orders
         public DateTime? DateTimeEndOrder { get; set; }
         public DateTime? DateTimeLeft { get; set; }
         
-        public required OrderDetails OrderDetails { get; set; }
+        public required OrderDetail OrderDetail { get; set; }
+        
+        public bool IsDeleted { get; set; }
     }
 }

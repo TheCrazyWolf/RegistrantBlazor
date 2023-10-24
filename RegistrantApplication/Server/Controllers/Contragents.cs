@@ -28,7 +28,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanCreateContragent)
+            if (session != null && !session.Account.AccountRole.CanCreateContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             if (string.IsNullOrEmpty(contragent.Title))
@@ -38,7 +38,9 @@ namespace RegistrantApplication.Server.Controllers
                 return BadRequest(ConfigMsg.ValidationElementtExist);
             
             contragent.DateTimeCreated = DateTime.Now;
-            Ef.Add(MyValidator.GetModel(contragent));
+            contragent = MyValidator.GetModel(contragent);
+
+            Ef.Add(contragent);
             Ef.SaveChanges();
             return Ok();
         }
@@ -55,7 +57,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanEditContragent)
+            if (session != null && !session.Account.AccountRole.CanEditContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             var found = Ef.Contragents
@@ -87,7 +89,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanViewContragent)
+            if (session != null && !session.Account.AccountRole.CanViewContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             if (page < 0 )
@@ -95,7 +97,7 @@ namespace RegistrantApplication.Server.Controllers
 
             long totalRecords = Ef.Contragents.Count(x => x.IsDeleted == showDeleted);
 
-            long totalPages = totalRecords / ConfigServer.RecordsByPage;
+            long totalPages = totalRecords / ConfigSrv.RecordsByPage;
 
             if (page > totalPages)
                 return BadRequest(ConfigMsg.PaginationError);
@@ -107,8 +109,8 @@ namespace RegistrantApplication.Server.Controllers
                data = Ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => x.IsDeleted == showDeleted)
-                    .Skip((int)(page * ConfigServer.RecordsByPage))
-                    .Take((int)ConfigServer.RecordsByPage)
+                    .Skip((int)(page * ConfigSrv.RecordsByPage))
+                    .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
                 totalRecords = Ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
             }
@@ -117,13 +119,13 @@ namespace RegistrantApplication.Server.Controllers
                 data = Ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper()))
-                    .Skip((int)(page * ConfigServer.RecordsByPage))
-                    .Take((int)ConfigServer.RecordsByPage)
+                    .Skip((int)(page * ConfigSrv.RecordsByPage))
+                    .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
 
                 totalRecords = Ef.Contragents.Count(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper()
                     .Contains(search.ToUpper()));
-                totalPages = totalRecords / ConfigServer.RecordsByPage;
+                totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
 
             IViewAPI view = new ViewContragents()
@@ -132,7 +134,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalPages = totalPages,
                 CurrentPage = page,
                 Contragents = data,
-                MaxRecordsOnPageConst = ConfigServer.RecordsByPage
+                MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
 
             return Ok(view);
@@ -150,7 +152,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanDeleteContragent)
+            if (session != null && !session.Account.AccountRole.CanDeleteContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             foreach (var item in idsContragents)

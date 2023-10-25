@@ -7,6 +7,7 @@
 @using Blazored.LocalStorage
 @using RegistrantApplication.Client.Pages.Accounts.Components
 @using RegistrantApplication.Shared
+@using RegistrantApplication.Shared.API.Accounts.Get
 @using RegistrantApplication.Shared.Database.Accounts
 
 @inject RApi Api
@@ -154,7 +155,7 @@
     [SupplyParameterFromQuery]
     public bool ShowEmployee { get; set; }
 
-    private ViewAccounts? ViewData { get; set; } = new ViewAccounts();
+    private GetViewAccounts? ViewData { get; set; } = new GetViewAccounts();
 
     public List<Account>? SelectedDrivers { get; set; } = new List<Account>();
 
@@ -173,7 +174,7 @@
         StateHasChanged();
     }
 
-    private async Task<ViewAccounts?> DoRequestAsync()
+    private async Task<GetViewAccounts?> DoRequestAsync()
     {
         var result = await Api.Accounts
             .Get(
@@ -197,7 +198,7 @@
                 );
         }
 
-        return result.Content == null ? new ViewAccounts() : JsonConvert.DeserializeObject<ViewAccounts>(result.Content);
+        return result.Content == null ? new GetViewAccounts() : JsonConvert.DeserializeObject<GetViewAccounts>(result.Content);
     }
 
 }

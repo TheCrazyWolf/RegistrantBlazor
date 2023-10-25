@@ -6,6 +6,7 @@ using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Admin;
+using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
 
 namespace RegistrantApplication.Server.Controllers;
 
@@ -30,7 +31,7 @@ public class Events : BaseApiController
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         @event.Account = session.Account;
-        @event = MyValidator.GetModel(@event);
+        @event = ModelTransfer.GetModel(@event);
         Ef.Add(@event);
         await Ef.SaveChangesAsync();
         return Ok();

@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="API\Contragents\Get\" />
+    <Folder Include="API\Contragents\Post\" />
     <Folder Include="Database\" />
   </ItemGroup>
 </Project>

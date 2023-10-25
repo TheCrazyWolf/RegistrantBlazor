@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace RegistrantApplication.Shared.Database.Accounts
 {
-    public class Account
+    public class Account 
     {
         [Key]
         public long IdAccount { get; set; }

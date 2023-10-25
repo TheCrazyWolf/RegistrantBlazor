@@ -45,7 +45,7 @@ public class Orders : BaseApiController
         if (session != null && !session.Account.AccountRole.CanCreateOrders)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
-        order = MyValidator.GetModel(order);
+        order = ModelTransfer.GetModel(order);
 
         if (order != null && order.OrderDetail == null)
                 order.OrderDetail = new OrderDetail();
@@ -77,7 +77,7 @@ public class Orders : BaseApiController
         if (foundOrder == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        foundOrder = MyValidator.GetModel(order);
+        foundOrder = ModelTransfer.GetModel(order);
         
         return Ok();
 

@@ -100,7 +100,7 @@ public class Roles : BaseApiController
         if (session != null && !session.Account.AccountRole.CanCreateRoles)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        role = MyValidator.GetModel(role);
+        role = ModelTransfer.GetModel(role);
 
         Ef.Add(role);
         await Ef.SaveChangesAsync();
@@ -123,7 +123,7 @@ public class Roles : BaseApiController
         if (session != null && !session.Account.AccountRole.CanEditRoles)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
-        role = MyValidator.GetModel(role);
+        role = ModelTransfer.GetModel(role);
         Ef.Update(role);
         await Ef.SaveChangesAsync();
         return Ok();

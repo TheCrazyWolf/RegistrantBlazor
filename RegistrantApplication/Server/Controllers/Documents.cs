@@ -38,7 +38,7 @@ public class Documents : BaseApiController
         if (foundAccount == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        document = MyValidator.GetModel(document);
+        document = ModelTransfer.GetModel(document);
         document.Account = foundAccount;
         
         Ef.Add(document);
@@ -70,7 +70,7 @@ public class Documents : BaseApiController
         if (foundDocument == null)
             return BadRequest(ConfigMsg.ValidationElementNotFound);
 
-        foundDocument = MyValidator.GetModel(document);
+        foundDocument = ModelTransfer.GetModel(document);
 
         Ef.Update(foundDocument);
         await Ef.SaveChangesAsync();

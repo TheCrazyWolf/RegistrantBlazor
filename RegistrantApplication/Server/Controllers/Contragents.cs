@@ -5,6 +5,7 @@ using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Contragents;
+using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -38,7 +39,7 @@ namespace RegistrantApplication.Server.Controllers
                 return BadRequest(ConfigMsg.ValidationElementtExist);
             
             contragent.DateTimeCreated = DateTime.Now;
-            contragent = MyValidator.GetModel(contragent);
+            contragent = ModelTransfer.GetModel(contragent);
 
             Ef.Add(contragent);
             Ef.SaveChanges();
@@ -70,7 +71,7 @@ namespace RegistrantApplication.Server.Controllers
                 return BadRequest(ConfigMsg.ValidationTextEmpty);
             
             found.IsDeleted = contragent.IsDeleted;
-            Ef.Update(MyValidator.GetModel(found));
+            Ef.Update(ModelTransfer.GetModel(found));
             Ef.SaveChanges();
             return Ok();
         }

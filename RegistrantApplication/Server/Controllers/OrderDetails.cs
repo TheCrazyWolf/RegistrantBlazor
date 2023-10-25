@@ -38,7 +38,7 @@ public class OrderDetails : BaseApiController
         if (foundOrder == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        foundOrder.OrderDetail = MyValidator.GetModel(orderDetails);
+        foundOrder.OrderDetail = ModelTransfer.GetModel(orderDetails);
         Ef.Update(foundOrder);
         await Ef.SaveChangesAsync();
         return Ok();
@@ -88,7 +88,7 @@ public class OrderDetails : BaseApiController
         var orderDetailfFound = await Ef.OrderDetails
             .FirstOrDefaultAsync(x => x.IdOrderDetails == orderDetail.IdOrderDetails);
 
-        orderDetailfFound = MyValidator.GetModel(orderDetail);
+        orderDetailfFound = ModelTransfer.GetModel(orderDetail);
 
         Ef.Update(orderDetailfFound);
         await Ef.SaveChangesAsync();

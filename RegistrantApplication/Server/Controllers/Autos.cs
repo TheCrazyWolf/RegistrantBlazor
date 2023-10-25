@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.API.Autos.Post;
 using RegistrantApplication.Shared.Database.Drivers;
 
 namespace RegistrantApplication.Server.Controllers;
@@ -13,36 +14,6 @@ public class Autos : BaseApiController
 {
     public Autos(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
     {
-    }
-    
-    /// <summary>
-    /// Добавление машин за учетной записью
-    /// </summary>
-    /// <param name="token">Действующий токен</param>
-    /// <param name="idAccount">ID аккаунта</param>
-    /// <param name="auto">Модель машины</param>
-    /// <returns>200 в случае успешного сохранения</returns>
-    [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] Auto auto)
-    {
-        if (!IsValidateToken(token, out var session))
-            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-
-        if (session != null && !session.Account.AccountRole.CanCreateAutos)
-            return StatusCode(403, ConfigMsg.NotAllowed);
-        
-        var account = await Ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
-
-        if (account == null)
-            return NotFound(ConfigMsg.ValidationElementNotFound);
-
-        auto = MyValidator.GetModel(auto);
-        auto.Account = account;
-
-        Ef.Add(auto);
-        await Ef.SaveChangesAsync();
-        return Ok();
     }
 
     /// <summary>
@@ -72,6 +43,36 @@ public class Autos : BaseApiController
         return Ok(autoList);
     }
 
+    
+    /// <summary>
+    /// Добавление машин за учетной записью
+    /// </summary>
+    /// <param name="token">Действующий токен</param>
+    /// <param name="idAccount">ID аккаунта</param>
+    /// <param name="auto">Модель машины</param>
+    /// <returns>200 в случае успешного сохранения</returns>
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] FormAuto auto)
+    {
+        if (!IsValidateToken(token, out var session))
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        if (session != null && !session.Account.AccountRole.CanCreateAutos)
+            return StatusCode(403, ConfigMsg.NotAllowed);
+        
+        var account = await Ef.Accounts
+            .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
+
+        if (account == null)
+            return NotFound(ConfigMsg.ValidationElementNotFound);
+
+        var newAuto = await ModelTransfer.FromFormCreate(new Auto(), auto, session.Account.AccountRole, Ef);
+        
+        Ef.Add(newAuto);
+        await Ef.SaveChangesAsync();
+        return Ok();
+    }
+    
     /// <summary>
     /// Обновление данных о машине
     /// </summary>
@@ -79,7 +80,7 @@ public class Autos : BaseApiController
     /// <param name="auto">Модель машины с сохранением прошлого ID</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Auto auto)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] FormAuto auto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -92,8 +93,10 @@ public class Autos : BaseApiController
 
         if (foundAuto == null)
             return NoContent();
+
+        foundAuto = await ModelTransfer.FromFormUpdate(foundAuto, auto, session.Account.AccountRole, Ef);
         
-        Ef.Update(MyValidator.GetModel(foundAuto));
+        Ef.Update(foundAuto);
         await Ef.SaveChangesAsync();
         return Ok();
     }

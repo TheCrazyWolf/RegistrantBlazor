@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -32,7 +32,7 @@ public class Autos : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var autoList =  Ef.AccountsAutos
+        var autoList =  _ef.AccountsAutos
             .Include(x => x.Account)
             .Where(x => x.Account != null && x.Account.IdAccount == idAccount && x.IsDeleted == showDeleted)
             .ToList();
@@ -60,16 +60,16 @@ public class Autos : BaseApiController
         if (session != null && !session.Account.AccountRole.CanCreateAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
-        var account = await Ef.Accounts
+        var account = await _ef.Accounts
             .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
 
         if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        var newAuto = await ModelTransfer.FromFormCreate(new Auto(), auto, session.Account.AccountRole, Ef);
+        var newAuto = await ModelTransfer.FromFormCreate(new Auto(), auto, session.Account.AccountRole, _ef);
         
-        Ef.Add(newAuto);
-        await Ef.SaveChangesAsync();
+        _ef.Add(newAuto);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
     
@@ -88,16 +88,16 @@ public class Autos : BaseApiController
         if (session != null && !session.Account.AccountRole.CanEditAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var foundAuto = await Ef.AccountsAutos
+        var foundAuto = await _ef.AccountsAutos
             .FirstOrDefaultAsync(x => x.IdAuto == auto.IdAuto);
 
         if (foundAuto == null)
             return NoContent();
 
-        foundAuto = await ModelTransfer.FromFormUpdate(foundAuto, auto, session.Account.AccountRole, Ef);
+        foundAuto = await ModelTransfer.FromFormUpdate(foundAuto, auto, session.Account.AccountRole, _ef);
         
-        Ef.Update(foundAuto);
-        await Ef.SaveChangesAsync();
+        _ef.Update(foundAuto);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
     
@@ -118,17 +118,17 @@ public class Autos : BaseApiController
 
         foreach (var item in idAutos)
         {
-            var foundAuto = await Ef.AccountsAutos
+            var foundAuto = await _ef.AccountsAutos
                 .FirstOrDefaultAsync(x => x.IdAuto == item);
             
             if(foundAuto == null)
                 continue;
 
             foundAuto.IsDeleted = true;
-            Ef.Update(foundAuto);
-            await Ef.SaveChangesAsync();
+            _ef.Update(foundAuto);
+            await _ef.SaveChangesAsync();
         }
 
         return Ok();
     } 
-}
+}*/

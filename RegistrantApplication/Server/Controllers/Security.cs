@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -11,10 +12,10 @@ namespace RegistrantApplication.Server.Controllers;
 [Route("api/[controller]")]
 public class Security : BaseApiController
 {
-    public Security(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    public Security(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
     {
     }
-
+    
     /// <summary>
     /// Создание сесии и передача токена клиенту
     /// </summary>
@@ -25,7 +26,7 @@ public class Security : BaseApiController
     [HttpGet("GetToken")]
     public async Task<IActionResult> GetToken(string phone, string? password, string? fingerPrintBrowser)
     {
-        var foundAccount = await Ef.Accounts
+        var foundAccount = await _ef.Accounts
             .Include(x=> x.AccountRole)
             .FirstOrDefaultAsync(x =>
                 x.PhoneNumber != null &&
@@ -48,8 +49,8 @@ public class Security : BaseApiController
             FingerPrintIdentity = fingerPrintBrowser
         };
 
-        await Ef.AddAsync(session);
-        await Ef.SaveChangesAsync();
+        await _ef.AddAsync(session);
+        await _ef.SaveChangesAsync();
         return Ok(session);
     }
 
@@ -65,20 +66,20 @@ public class Security : BaseApiController
         if (!IsValidateToken(token, out _))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var foundToken = await Ef.AccountsSessions
+        var foundToken = await _ef.AccountsSessions
             .FirstOrDefaultAsync(x => x.Token == token);
 
         if (foundToken == null)
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
         foundToken.DateTimeSessionExpired = DateTime.Now;
-        Ef.Update(foundToken);
-        await Ef.SaveChangesAsync();
+        _ef.Update(foundToken);
+        await _ef.SaveChangesAsync();
 
         if (!forceLogout)
             return Ok();
 
-        var tokenAcitve = Ef.AccountsSessions
+        var tokenAcitve = _ef.AccountsSessions
             .Include(x => x.Account)
             .Where(x => x.DateTimeSessionExpired >= DateTime.Now)
             .ToList();
@@ -86,8 +87,8 @@ public class Security : BaseApiController
         foreach (var tokenCurrent in tokenAcitve)
         {
             tokenCurrent.DateTimeSessionExpired = DateTime.Now;
-            Ef.Update(tokenCurrent);
-            await Ef.SaveChangesAsync();
+            _ef.Update(tokenCurrent);
+            await _ef.SaveChangesAsync();
         }
 
         return Ok();
@@ -115,8 +116,8 @@ public class Security : BaseApiController
             return BadRequest("Новый пароль не повторятся правильно");
 
         session.Account.PasswordHash = await ModelTransfer.GetMd5(newPassword);
-        Ef.Update(session.Account);
-        await Ef.SaveChangesAsync();
+        _ef.Update(session.Account);
+        await _ef.SaveChangesAsync();
 
         return Ok();
     }
@@ -127,18 +128,16 @@ public class Security : BaseApiController
     {
         foreach (var token in arrayTokens)
         {
-            var foundToken = await Ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
+            var foundToken = await _ef.AccountsSessions.FirstOrDefaultAsync(x => x.Token == token);
 
             if (foundToken == null)
                 continue;
 
             foundToken.DateTimeSessionExpired = DateTime.Now;
-            Ef.Update(foundToken);
-            await Ef.SaveChangesAsync();
+            _ef.Update(foundToken);
+            await _ef.SaveChangesAsync();
         }
 
         return Ok();
     }
-
-    
 }

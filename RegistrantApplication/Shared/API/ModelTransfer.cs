@@ -1,11 +1,10 @@
-﻿using RegistrantApplication.Shared.API.Accounts.Get;
-using RegistrantApplication.Shared.API.Accounts.Post;
-using RegistrantApplication.Shared.Database.Accounts;
+﻿using RegistrantApplication.Shared.Database.Accounts;
 
 namespace RegistrantApplication.Shared.API;
 
 public static class ModelTransfer
 {
+    /*
     public static Account FromForm(Account? entityAccount, FormAccount form)
     {
         if (entityAccount == null)
@@ -53,6 +52,7 @@ public static class ModelTransfer
 
         return view;
     }
+    */
     
     
     public static string ValidationNumber(string number)

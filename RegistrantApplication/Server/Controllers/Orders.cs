@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -50,8 +50,8 @@ public class Orders : BaseApiController
         if (order != null && order.OrderDetail == null)
                 order.OrderDetail = new OrderDetail();
 
-        Ef.Add(order);
-        await Ef.SaveChangesAsync();
+        _ef.Add(order);
+        await _ef.SaveChangesAsync();
 
         return Ok();
     }
@@ -71,7 +71,7 @@ public class Orders : BaseApiController
         if (session != null && !session.Account.AccountRole.CanEditOrders)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var foundOrder = await Ef.Orders
+        var foundOrder = await _ef.Orders
             .FirstOrDefaultAsync(x => x.IdOrder == order.IdOrder);
 
         if (foundOrder == null)
@@ -100,16 +100,16 @@ public class Orders : BaseApiController
 
         foreach (var item in idsOrder)
         {
-            var foundOrder = await Ef.Orders.FirstOrDefaultAsync(x => x.IdOrder == item);
+            var foundOrder = await _ef.Orders.FirstOrDefaultAsync(x => x.IdOrder == item);
             if(foundOrder == null)
                 continue;
 
             foundOrder.IsDeleted = true;
-            Ef.Update(foundOrder);
+            _ef.Update(foundOrder);
         }
 
-        await Ef.SaveChangesAsync();
+        await _ef.SaveChangesAsync();
 
         return Ok();
     }
-}
+}*/

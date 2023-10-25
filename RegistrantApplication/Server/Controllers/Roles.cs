@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -26,7 +26,7 @@ public class Roles : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        var role = await Ef.AccountRoles.FirstOrDefaultAsync(x =>
+        var role = await _ef.AccountRoles.FirstOrDefaultAsync(x =>
             session != null && x.IdRole == session.Account.AccountRole.IdRole);
 
         if (role == null)
@@ -49,7 +49,7 @@ public class Roles : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewRoles)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var roles = Ef.AccountRoles
+        var roles = _ef.AccountRoles
             .ToList();
         
         if(roles == null)
@@ -74,7 +74,7 @@ public class Roles : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewRoles)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var role = await Ef.Accounts
+        var role = await _ef.Accounts
             .Include(x => x.AccountRole)
             .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
         
@@ -102,8 +102,8 @@ public class Roles : BaseApiController
 
         role = ModelTransfer.GetModel(role);
 
-        Ef.Add(role);
-        await Ef.SaveChangesAsync();
+        _ef.Add(role);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
 
@@ -124,8 +124,8 @@ public class Roles : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
         
         role = ModelTransfer.GetModel(role);
-        Ef.Update(role);
-        await Ef.SaveChangesAsync();
+        _ef.Update(role);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
 
@@ -147,14 +147,14 @@ public class Roles : BaseApiController
 
         foreach (var role in idRoles)
         {
-            var foundRole = await Ef.AccountRoles.FirstOrDefaultAsync(x => x.IdRole == role);
+            var foundRole = await _ef.AccountRoles.FirstOrDefaultAsync(x => x.IdRole == role);
             if(foundRole == null)
                 continue;
-            Ef.Remove(foundRole);
+            _ef.Remove(foundRole);
         }
         
-        await Ef.SaveChangesAsync();
+        await _ef.SaveChangesAsync();
         return Ok();
     }
     
-}
+}*/

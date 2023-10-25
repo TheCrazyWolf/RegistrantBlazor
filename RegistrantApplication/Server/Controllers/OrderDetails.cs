@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -31,7 +31,7 @@ public class OrderDetails : BaseApiController
         if (session != null && !session.Account.AccountRole.CanCreateOrderDetails)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var foundOrder = await Ef.Orders
+        var foundOrder = await _ef.Orders
             .Include(order => order.OrderDetail)
             .FirstOrDefaultAsync(x => x.IdOrder == idOrder);
 
@@ -39,8 +39,8 @@ public class OrderDetails : BaseApiController
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
         foundOrder.OrderDetail = ModelTransfer.GetModel(orderDetails);
-        Ef.Update(foundOrder);
-        await Ef.SaveChangesAsync();
+        _ef.Update(foundOrder);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
     
@@ -59,7 +59,7 @@ public class OrderDetails : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewOrderDetails)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var order = await Ef.Orders
+        var order = await _ef.Orders
             .Include(x => x.OrderDetail)
             .FirstOrDefaultAsync(x => x.IdOrder == idOrder);
 
@@ -85,13 +85,13 @@ public class OrderDetails : BaseApiController
         if (session != null && !session.Account.AccountRole.CanEditOrderDetails)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var orderDetailfFound = await Ef.OrderDetails
+        var orderDetailfFound = await _ef.OrderDetails
             .FirstOrDefaultAsync(x => x.IdOrderDetails == orderDetail.IdOrderDetails);
 
         orderDetailfFound = ModelTransfer.GetModel(orderDetail);
 
-        Ef.Update(orderDetailfFound);
-        await Ef.SaveChangesAsync();
+        _ef.Update(orderDetailfFound);
+        await _ef.SaveChangesAsync();
 
         return Ok();
     }
@@ -107,20 +107,20 @@ public class OrderDetails : BaseApiController
 
         foreach (var id in idsOrderDetails)
         {
-            var foundDetail = await Ef.OrderDetails
+            var foundDetail = await _ef.OrderDetails
                 .FirstOrDefaultAsync(x => x.IdOrderDetails == id);
             
             if(foundDetail ==null)
                 continue;
 
-            Ef.Remove(foundDetail);
+            _ef.Remove(foundDetail);
 
         }
 
-        await Ef.SaveChangesAsync();
+        await _ef.SaveChangesAsync();
 
         return Ok();
 
     }
     
-}
+}*/

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.Database.Accounts;
@@ -8,12 +9,13 @@ namespace RegistrantApplication.Server.Controllers.BaseAPI
     public class BaseApiController : ControllerBase
     {
         protected readonly ILogger<BaseApiController> _logger;
-        protected readonly LiteContext Ef;
-        
-        public BaseApiController(ILogger<BaseApiController> logger, LiteContext ef)
+        protected readonly LiteContext _ef;
+        protected readonly IMapper _mapper;
+        public BaseApiController(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper)
         {
             _logger = logger;
-            Ef = ef;
+            _ef = ef;
+            _mapper = mapper;
         }
         
         /// <summary>
@@ -30,7 +32,7 @@ namespace RegistrantApplication.Server.Controllers.BaseAPI
                 return false;
             }
 
-            session =  Ef?.AccountsSessions
+            session =  _ef?.AccountsSessions
                 .Include(x => x.Account)
                 .Include(x => x.Account.AccountRole)
                 .FirstOrDefault(x => x.Token == token && x.DateTimeSessionExpired >= DateTime.Now);

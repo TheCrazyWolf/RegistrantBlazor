@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*
+using Microsoft.AspNetCore.Mvc;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
@@ -35,14 +36,14 @@ namespace RegistrantApplication.Server.Controllers
             if (string.IsNullOrEmpty(contragent.Title))
                 return BadRequest(ConfigMsg.ValidationTextEmpty);
 
-            if (Ef.Contragents.Any(x => x.Title.ToUpper() == contragent.Title.ToUpper() && x.IsDeleted == false))
+            if (_ef.Contragents.Any(x => x.Title.ToUpper() == contragent.Title.ToUpper() && x.IsDeleted == false))
                 return BadRequest(ConfigMsg.ValidationElementtExist);
             
             contragent.DateTimeCreated = DateTime.Now;
             contragent = ModelTransfer.GetModel(contragent);
 
-            Ef.Add(contragent);
-            Ef.SaveChanges();
+            _ef.Add(contragent);
+            _ef.SaveChanges();
             return Ok();
         }
 
@@ -61,7 +62,7 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanEditContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
-            var found = Ef.Contragents
+            var found = _ef.Contragents
                 .FirstOrDefault(x=> x.IdContragent == contragent.IdContragent);
 
             if (found == null)
@@ -71,8 +72,8 @@ namespace RegistrantApplication.Server.Controllers
                 return BadRequest(ConfigMsg.ValidationTextEmpty);
             
             found.IsDeleted = contragent.IsDeleted;
-            Ef.Update(ModelTransfer.GetModel(found));
-            Ef.SaveChanges();
+            _ef.Update(ModelTransfer.GetModel(found));
+            _ef.SaveChanges();
             return Ok();
         }
         
@@ -96,7 +97,7 @@ namespace RegistrantApplication.Server.Controllers
             if (page < 0 )
                 return BadRequest(ConfigMsg.PaginationError);
 
-            long totalRecords = Ef.Contragents.Count(x => x.IsDeleted == showDeleted);
+            long totalRecords = _ef.Contragents.Count(x => x.IsDeleted == showDeleted);
 
             long totalPages = totalRecords / ConfigSrv.RecordsByPage;
 
@@ -107,24 +108,24 @@ namespace RegistrantApplication.Server.Controllers
 
             if (string.IsNullOrEmpty(search))
             {
-               data = Ef.Contragents
+               data = _ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => x.IsDeleted == showDeleted)
                     .Skip((int)(page * ConfigSrv.RecordsByPage))
                     .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
-                totalRecords = Ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
+                totalRecords = _ef.Contragents.Where(x => x.IsDeleted == showDeleted).Count();
             }
             else
             {
-                data = Ef.Contragents
+                data = _ef.Contragents
                     .OrderBy(x => x.Title)
                     .Where(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper().Contains(search.ToUpper()))
                     .Skip((int)(page * ConfigSrv.RecordsByPage))
                     .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
 
-                totalRecords = Ef.Contragents.Count(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper()
+                totalRecords = _ef.Contragents.Count(x => (x.IsDeleted == showDeleted) && x.Title.ToUpper()
                     .Contains(search.ToUpper()));
                 totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
@@ -158,12 +159,12 @@ namespace RegistrantApplication.Server.Controllers
             
             foreach (var item in idsContragents)
             {
-                var found = Ef.Contragents.FirstOrDefault(x => x.IdContragent == item);
+                var found = _ef.Contragents.FirstOrDefault(x => x.IdContragent == item);
                 if (found == null)
                     continue;
                 found.IsDeleted = true;
-                Ef.Update(found);
-                Ef.SaveChanges();
+                _ef.Update(found);
+                _ef.SaveChanges();
             }
 
             return Ok();
@@ -171,3 +172,4 @@ namespace RegistrantApplication.Server.Controllers
 
     }
 }
+*/

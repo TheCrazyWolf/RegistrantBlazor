@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="API\AutoDto\" />
     <Folder Include="API\Contragents\Get\" />
     <Folder Include="API\Contragents\Post\" />
     <Folder Include="Database\" />

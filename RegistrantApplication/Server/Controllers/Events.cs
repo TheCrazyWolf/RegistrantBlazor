@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -32,8 +32,8 @@ public class Events : BaseApiController
 
         @event.Account = session.Account;
         @event = ModelTransfer.GetModel(@event);
-        Ef.Add(@event);
-        await Ef.SaveChangesAsync();
+        _ef.Add(@event);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
     
@@ -52,13 +52,13 @@ public class Events : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewLogs)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        long totalRecords = Ef.Events.Count();
+        long totalRecords = _ef.Events.Count();
         var totalPages = totalRecords / ConfigSrv.RecordsByPage;
         
         if (page < 0 && page > totalPages )
             return BadRequest(ConfigMsg.PaginationError);
 
-        var events = Ef.Events
+        var events = _ef.Events
             .Include(x=> x.Account)
             .OrderByDescending(x => x.IdEvent)
             .Skip((int)(page * ConfigSrv.RecordsByPage))
@@ -77,4 +77,4 @@ public class Events : BaseApiController
     }
     
     
-}
+}*/

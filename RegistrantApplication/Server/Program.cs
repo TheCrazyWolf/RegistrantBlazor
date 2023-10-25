@@ -1,3 +1,4 @@
+using Mapster;
 using RegistrantApplication.Server.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<LiteContext>();
 builder.Services.AddSwaggerGen();
 builder.Configuration.AddJsonFile("appsettings.json");
+builder.Services.AddMapster();
 //builder.WebHost.UseUrls("https://*:8080", "http://*:8080");
 
 var app = builder.Build();

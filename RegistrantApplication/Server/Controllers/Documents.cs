@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -32,7 +32,7 @@ public class Documents : BaseApiController
         if (session != null && !session.Account.AccountRole.CanCreateDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var foundAccount = await Ef.Accounts
+        var foundAccount = await _ef.Accounts
             .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
 
         if (foundAccount == null)
@@ -41,9 +41,9 @@ public class Documents : BaseApiController
         document = ModelTransfer.GetModel(document);
         document.Account = foundAccount;
         
-        Ef.Add(document);
-        Ef.Update(foundAccount);
-        await Ef.SaveChangesAsync();
+        _ef.Add(document);
+        _ef.Update(foundAccount);
+        await _ef.SaveChangesAsync();
         return Ok();
     }
 
@@ -63,7 +63,7 @@ public class Documents : BaseApiController
         if (session != null && !session.Account.AccountRole.CanEditDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var foundDocument = await Ef.AccountsDocuments
+        var foundDocument = await _ef.AccountsDocuments
             .Include(x => x.FileDocument)
             .FirstOrDefaultAsync(x => x.IdDocument == document.IdDocument);
 
@@ -72,8 +72,8 @@ public class Documents : BaseApiController
 
         foundDocument = ModelTransfer.GetModel(document);
 
-        Ef.Update(foundDocument);
-        await Ef.SaveChangesAsync();
+        _ef.Update(foundDocument);
+        await _ef.SaveChangesAsync();
 
         return Ok();
 
@@ -96,15 +96,15 @@ public class Documents : BaseApiController
 
         foreach (var item in idsDocuments)
         {
-            var foundDocument = await Ef.AccountsDocuments
+            var foundDocument = await _ef.AccountsDocuments
                 .FirstOrDefaultAsync(x => x.IdDocument == item);
             
             if(foundDocument ==null)
                 continue;
 
             foundDocument.IsDeleted = true;
-            Ef.Update(foundDocument);
-            await Ef.SaveChangesAsync();
+            _ef.Update(foundDocument);
+            await _ef.SaveChangesAsync();
         }
 
         return Ok();
@@ -126,7 +126,7 @@ public class Documents : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var documents = Ef.AccountsDocuments
+        var documents = _ef.AccountsDocuments
             .Include(x => x.Account)
             .Where(x => x.Account != null && x.Account.IdAccount == idAccount && x.IsDeleted == showDeleted)
             .ToList();
@@ -139,4 +139,4 @@ public class Documents : BaseApiController
     }
 
     
-}
+}*/

@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.API;
-using RegistrantApplication.Shared.API.Accounts;
-using RegistrantApplication.Shared.API.Accounts.Get;
-using RegistrantApplication.Shared.API.Accounts.Post;
-using RegistrantApplication.Shared.API.View;
+using RegistrantApplication.Shared.API.AccountsDto;
 using RegistrantApplication.Shared.Database.Accounts;
 using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
 
@@ -18,10 +16,9 @@ namespace RegistrantApplication.Server.Controllers
     [Route("api/[controller]")]
     public class Accounts : BaseApiController
     {
-        public Accounts(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+        public Accounts(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
         {
         }
-        
 
         /// <summary>
         /// Получить список аккаунтов по странично
@@ -45,7 +42,7 @@ namespace RegistrantApplication.Server.Controllers
             if (page < 0)
                 return BadRequest(ConfigMsg.PaginationError);
 
-            long totalRecords = Ef.Accounts
+            long totalRecords = _ef.Accounts
                 .Count(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee);
 
             long totalPages = totalRecords / ConfigSrv.RecordsByPage;
@@ -57,17 +54,17 @@ namespace RegistrantApplication.Server.Controllers
 
             if (string.IsNullOrEmpty(search))
             {
-                data = Ef.Accounts
+                data = _ef.Accounts
                     .OrderBy(x => x.IdAccount)
                     .Where(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee)
                     .Skip((int)(page * ConfigSrv.RecordsByPage))
                     .Take((int)ConfigSrv.RecordsByPage)
                     .ToList();
-                totalRecords = Ef.Accounts.Count(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee);
+                totalRecords = _ef.Accounts.Count(x => x.IsDeleted == showDeleted && x.IsEmployee == showEmployee);
             }
             else
             {
-                data = Ef.Accounts
+                data = _ef.Accounts
                     .OrderBy(x => x.IdAccount)
                     .Where(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee)
                                 && x.Family.ToUpper().Contains(search.ToUpper()))
@@ -76,45 +73,23 @@ namespace RegistrantApplication.Server.Controllers
                     .ToList();
 
                 totalRecords =
-                    Ef.Accounts.Count(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) && x.Family
+                    _ef.Accounts.Count(x => (x.IsDeleted == showDeleted && x.IsEmployee == showEmployee) && x.Family
                         .ToUpper()
                         .Contains(search.ToUpper()));
                 totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
 
-            GetViewAccounts view = new GetViewAccounts()
+            ViewAccountsDto view = new ViewAccountsDto()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Accounts = new List<GetAccount>(),
+                Accounts = data.Adapt<List<AccountDto>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
-            data.ForEach(x=> view.Accounts.Add(Shared.API.ModelTransfer.FromDB(x)));
             
             return Ok(view);
         }
-
-
-        /// <summary>
-        /// Получение информации о текущем аккаунте
-        /// </summary>
-        /// <param name="token">Валидный токен</param>
-        /// <returns>Возращает инорфмацию о аккаунте с токенам</returns>
-        [HttpGet("GetDetailsFromToken")]
-        public IActionResult GetDetailsFromToken([FromHeader] string token)
-        {
-            if (!IsValidateToken(token, out var session))
-                return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
-
-            if (session != null && !session.Account.AccountRole.CanLogin)
-                return StatusCode(403, ConfigMsg.NotAllowed);
-
-            var account = Shared.API.ModelTransfer.FromDB(session.Account);
-            
-            return Ok(account);
-        }
-        
         
         /// <summary>
         /// Получить информацию о конкретном аккаунте
@@ -128,16 +103,19 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
+            if (idAccount == 0)
+                return Ok(session.Account.Adapt<AccountDto>());
+
             if (session != null && !session.Account.AccountRole.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
-            var currentAccount = Ef.Accounts
+            var currentAccount = _ef.Accounts
                 .FirstOrDefault(x => x.IdAccount == idAccount);
 
             if (currentAccount == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
-            
-            var account = ModelTransfer.FromDB(currentAccount);
+
+            var account = currentAccount.Adapt<AccountDto>();
 
             return Ok(account);
         }
@@ -149,7 +127,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Аккаунт</param>
         /// <returns></returns>
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] FormAccount form)
+        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AccountDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -157,20 +135,20 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanCreateAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
-            if (Ef.Accounts.Any(x =>
+            if (_ef.Accounts.Any(x =>
                     x.PhoneNumber == ModelTransfer.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                 return BadRequest("Этот объект уже существует");
 
-            var newAccount = await ModelTransfer.FromFormCreate(new Account(), form, session.Account.AccountRole, Ef);
+            var newAccount = form.Adapt<Account>();
             
-            await Ef.AddAsync(newAccount);
-            await Ef.SaveChangesAsync();
+            await _ef.AddAsync(newAccount);
+            await _ef.SaveChangesAsync();
 
-            return Ok();
+            return Ok(newAccount);
         }
         
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] FormAccount form)
+        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AccountDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -178,7 +156,7 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanEditAccount)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
-            var foundAccount = await Ef.Accounts
+            var foundAccount = await _ef.Accounts
                 .Include(x => x.AccountRole)
                 .FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
 
@@ -186,16 +164,16 @@ namespace RegistrantApplication.Server.Controllers
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
             if (foundAccount.PhoneNumber != ModelTransfer.ValidationNumber(form.PhoneNumber))
-                if (Ef.Accounts.Any(x =>
+                if (_ef.Accounts.Any(x =>
                         x.PhoneNumber == ModelTransfer.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                     return BadRequest("Этот объект уже существует");
 
-            foundAccount = await ModelTransfer.FromFormUpdate(foundAccount, form, session.Account.AccountRole, Ef);
+            foundAccount.Adapt(form);
 
-            Ef.Update(foundAccount);
-            await Ef.SaveChangesAsync();
+            _ef.Update(foundAccount);
+            await _ef.SaveChangesAsync();
 
-            return Ok();
+            return Ok(foundAccount);
         }
         
         /// <summary>
@@ -215,15 +193,16 @@ namespace RegistrantApplication.Server.Controllers
 
             foreach (var accountId in idsAccount)
             {
-                var foundAccount = await Ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == accountId);
+                var foundAccount = await _ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == accountId);
                 if (foundAccount == null)
                     continue;
                 foundAccount.IsDeleted = true;
-                Ef.Update(foundAccount);
+                _ef.Update(foundAccount);
             }
 
-            await Ef.SaveChangesAsync();
+            await _ef.SaveChangesAsync();
             return Ok();
         }
+        
     }
 }

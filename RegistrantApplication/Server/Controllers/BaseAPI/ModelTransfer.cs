@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.API.Accounts.Get;
-using RegistrantApplication.Shared.API.Accounts.Post;
 using RegistrantApplication.Shared.API.Autos.Post;
 using RegistrantApplication.Shared.Database.Accounts;
 using RegistrantApplication.Shared.Database.Contragents;
@@ -11,6 +9,7 @@ namespace RegistrantApplication.Server.Controllers.BaseAPI;
 
 public static class ModelTransfer
 {
+    /*
     public static async Task<Account> FromFormCreate(Account? entityAccount, FormAccount form, AccountRole role, LiteContext ef)
     {
         if (entityAccount == null)
@@ -122,6 +121,7 @@ public static class ModelTransfer
 
         return view;
     }
+    */
     
     
     public static string ValidationNumber(string number)

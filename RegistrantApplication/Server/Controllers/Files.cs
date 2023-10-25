@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -29,7 +29,7 @@ public class Files : BaseApiController
         if (session != null && !session.Account.AccountRole.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
-        var document = await Ef.Files
+        var document = await _ef.Files
             .FirstOrDefaultAsync(x => x.IdFile == idDocument);
         
         if (document == null)
@@ -43,4 +43,4 @@ public class Files : BaseApiController
         return file;
     }
     
-}
+}*/

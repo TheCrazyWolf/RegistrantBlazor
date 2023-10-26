@@ -1,9 +1,12 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.Database.Drivers;
+using RegistrantApplication.Shared.API.AccountsDto;
+using RegistrantApplication.Shared.Database.Accounts;
 
 namespace RegistrantApplication.Server.Controllers;
 
@@ -11,20 +14,20 @@ namespace RegistrantApplication.Server.Controllers;
 [Route("api/[controller]")]
 public class Documents : BaseApiController
 {
-    public Documents(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    public Documents(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
     {
     }
-
+    
     /// <summary>
     /// Создать документ
     /// </summary>
     /// <param name="token">Валидный токен</param>
     /// <param name="idAccount">ID аккаунта для которого создается документ</param>
-    /// <param name="document">Содержимое документа</param>
+    /// <param name="form">Содержимое документа</param>
     /// <param name="file">Загрузка файла</param>
     /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] Document document, [FromForm] IFormFile? file)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] DocumentDto form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -38,13 +41,14 @@ public class Documents : BaseApiController
         if (foundAccount == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        document = ModelTransfer.GetModel(document);
+        var document = form.Adapt<Document>();
         document.Account = foundAccount;
         
-        _ef.Add(document);
+        _ef.Add(form);
         _ef.Update(foundAccount);
         await _ef.SaveChangesAsync();
-        return Ok();
+        
+        return Ok(document.Adapt<DocumentDto>());
     }
 
     
@@ -52,10 +56,10 @@ public class Documents : BaseApiController
     /// Обновление документа
     /// </summary>
     /// <param name="token">Валидный токен</param>
-    /// <param name="document">Содержимое документа</param>
+    /// <param name="form">Содержимое документа</param>
     /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Document document)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DocumentDto form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -64,18 +68,17 @@ public class Documents : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundDocument = await _ef.AccountsDocuments
-            .Include(x => x.FileDocument)
-            .FirstOrDefaultAsync(x => x.IdDocument == document.IdDocument);
+            .FirstOrDefaultAsync(x => x.IdDocument == form.IdDocument);
 
         if (foundDocument == null)
             return BadRequest(ConfigMsg.ValidationElementNotFound);
 
-        foundDocument = ModelTransfer.GetModel(document);
+        foundDocument.Adapt(form);
 
         _ef.Update(foundDocument);
         await _ef.SaveChangesAsync();
 
-        return Ok();
+        return Ok(foundDocument.Adapt<DocumentDto>());
 
     }
 
@@ -134,9 +137,8 @@ public class Documents : BaseApiController
         if (documents == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        return Ok(documents);
+        return Ok(documents.Adapt<List<DocumentDto>>());
 
     }
-
     
-}*/
+}

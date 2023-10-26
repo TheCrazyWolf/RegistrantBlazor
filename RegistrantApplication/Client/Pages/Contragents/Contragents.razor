@@ -1,4 +1,4 @@
-﻿@page "/contragents"
+﻿@*@page "/contragents"
 @inject RApi Api
 @inject ISyncLocalStorageService Storage;
 
@@ -51,7 +51,7 @@
                 <thead>
                 <tr>
                     <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900"></th>
-                    @*<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">Идентификатор</th>*@
+                    $1$<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">Идентификатор</th>#1#
                     <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Название контрагента</th>
                     <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold text-gray-900">Дата создания</th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 md:pr-0">
@@ -65,7 +65,7 @@
                 {
                     <tr>
                         <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
-                        @*<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0"></td>*@
+                        $1$<td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0"></td>#1#
                         <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">Нет данных для просмотра</td>
                         <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
                         <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500"></td>
@@ -96,7 +96,7 @@
                                 </td>
                             }
 
-                            @*<td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.IdContragent</td>*@
+                            $1$<td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.IdContragent</td>#1#
                             <td class="whitespace-nowrap py-4 px-3 text-sm ">@item.Title</td>
                             <td class="whitespace-nowrap py-4 px-3 text-sm text-gray-500">@item.DateTimeCreated</td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 md:pr-0">
@@ -224,4 +224,4 @@
         return result.Content == null ? new ViewContragents() : JsonConvert.DeserializeObject<ViewContragents>(result.Content);
     }
 
-}
+}*@

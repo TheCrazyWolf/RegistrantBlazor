@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using RegistrantApplication.Shared.Database.Accounts;
 
-namespace RegistrantApplication.Shared.Database.Drivers
+namespace RegistrantApplication.Shared.Database.Accounts
 {
     public class Auto
     {

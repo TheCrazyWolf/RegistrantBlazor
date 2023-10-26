@@ -1,10 +1,12 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
-using RegistrantApplication.Shared.API.Autos.Post;
-using RegistrantApplication.Shared.Database.Drivers;
+using RegistrantApplication.Shared.API.AutoDto;
+using RegistrantApplication.Shared.Database.Accounts;
 
 namespace RegistrantApplication.Server.Controllers;
 
@@ -12,10 +14,10 @@ namespace RegistrantApplication.Server.Controllers;
 [Route("api/[controller]")]
 public class Autos : BaseApiController
 {
-    public Autos(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    public Autos(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
     {
     }
-
+    
     /// <summary>
     /// Получение списка машин закрепленных за учетной записью пользователя
     /// </summary>
@@ -39,8 +41,8 @@ public class Autos : BaseApiController
 
         if (autoList == null)
             return NoContent();
-
-        return Ok(autoList);
+        
+        return Ok(autoList.Adapt<List<AutoDto>>());
     }
 
     
@@ -52,7 +54,7 @@ public class Autos : BaseApiController
     /// <param name="auto">Модель машины</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] FormAuto auto)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] AutoDto auto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -66,11 +68,11 @@ public class Autos : BaseApiController
         if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        var newAuto = await ModelTransfer.FromFormCreate(new Auto(), auto, session.Account.AccountRole, _ef);
+        var newAuto = auto.Adapt<Account>();
         
         _ef.Add(newAuto);
         await _ef.SaveChangesAsync();
-        return Ok();
+        return Ok(newAuto);
     }
     
     /// <summary>
@@ -80,7 +82,7 @@ public class Autos : BaseApiController
     /// <param name="auto">Модель машины с сохранением прошлого ID</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] FormAuto auto)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AutoDto auto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -94,11 +96,11 @@ public class Autos : BaseApiController
         if (foundAuto == null)
             return NoContent();
 
-        foundAuto = await ModelTransfer.FromFormUpdate(foundAuto, auto, session.Account.AccountRole, _ef);
+        foundAuto.Adapt(auto);
         
         _ef.Update(foundAuto);
         await _ef.SaveChangesAsync();
-        return Ok();
+        return Ok(foundAuto);
     }
     
     /// <summary>
@@ -130,5 +132,6 @@ public class Autos : BaseApiController
         }
 
         return Ok();
-    } 
-}*/
+    }
+    
+}

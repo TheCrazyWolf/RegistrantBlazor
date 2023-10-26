@@ -1,10 +1,10 @@
-﻿using RegistrantApplication.Shared.API.View;
-using RegistrantApplication.Shared.Database.Contragents;
+﻿using RegistrantApplication.Shared.API.Contragents;
+using RegistrantApplication.Shared.API.View;
 
 namespace RegistrantApplication.Shared.API
 {
     public class ViewContragents : ViewBase
     {
-        public List<Contragent> Contragents { get; set; }
+        public List<ContragentDto> Contragents { get; set; }
     }
 }

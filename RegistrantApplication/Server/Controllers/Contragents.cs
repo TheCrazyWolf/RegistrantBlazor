@@ -1,12 +1,14 @@
-﻿/*
+﻿using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
+using RegistrantApplication.Shared.API.Contragents;
 using RegistrantApplication.Shared.API.View;
+using RegistrantApplication.Shared.Database.Accounts;
 using RegistrantApplication.Shared.Database.Contragents;
-using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -14,7 +16,7 @@ namespace RegistrantApplication.Server.Controllers
     [Route("api/[controller]")]
     public class Contragents : BaseApiController
     {
-        public Contragents(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+        public Contragents(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
         {
         }
         
@@ -22,10 +24,10 @@ namespace RegistrantApplication.Server.Controllers
         /// Создание нового контрагента
         /// </summary>
         /// <param name="token">Действующий токен</param>
-        /// <param name="contragent">Модель контрагента</param>
+        /// <param name="form">Модель контрагента</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPost("Create")]
-        public IActionResult Create([FromHeader] string token, [FromBody] Contragent contragent)
+        public IActionResult Create([FromHeader] string token, [FromBody] ContragentDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -33,28 +35,29 @@ namespace RegistrantApplication.Server.Controllers
             if (session != null && !session.Account.AccountRole.CanCreateContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
-            if (string.IsNullOrEmpty(contragent.Title))
+            if (string.IsNullOrEmpty(form.Title))
                 return BadRequest(ConfigMsg.ValidationTextEmpty);
 
-            if (_ef.Contragents.Any(x => x.Title.ToUpper() == contragent.Title.ToUpper() && x.IsDeleted == false))
+            if (_ef.Contragents.Any(x => x.Title.ToUpper() == form.Title.ToUpper() && x.IsDeleted == false))
                 return BadRequest(ConfigMsg.ValidationElementtExist);
             
-            contragent.DateTimeCreated = DateTime.Now;
-            contragent = ModelTransfer.GetModel(contragent);
-
+            form.DateTimeCreated = DateTime.Now;
+            var contragent = form.Adapt<Contragent>();
+            
             _ef.Add(contragent);
             _ef.SaveChanges();
-            return Ok();
+            
+            return Ok(contragent.Adapt<ContragentDto>());
         }
 
         /// <summary>
         /// Обновление модели
         /// </summary>
         /// <param name="token">Действующий токен</param>
-        /// <param name="contragent">Модель контрагента с сохранением ID</param>
+        /// <param name="form">Модель контрагента с сохранением ID</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPut("Update")]
-        public IActionResult Update([FromHeader] string token, [FromBody] Contragent contragent)
+        public IActionResult Update([FromHeader] string token, [FromBody] ContragentDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -63,18 +66,19 @@ namespace RegistrantApplication.Server.Controllers
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             var found = _ef.Contragents
-                .FirstOrDefault(x=> x.IdContragent == contragent.IdContragent);
+                .FirstOrDefault(x=> x.IdContragent == form.IdContragent);
 
             if (found == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
-            if (string.IsNullOrEmpty(contragent.Title))
+            if (string.IsNullOrEmpty(form.Title))
                 return BadRequest(ConfigMsg.ValidationTextEmpty);
+
+            found.Adapt(form);
             
-            found.IsDeleted = contragent.IsDeleted;
-            _ef.Update(ModelTransfer.GetModel(found));
+            _ef.Update(found);
             _ef.SaveChanges();
-            return Ok();
+            return Ok(found);
         }
         
         /// <summary>
@@ -135,7 +139,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Contragents = data,
+                Contragents = data.Adapt<List<ContragentDto>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
 
@@ -169,7 +173,6 @@ namespace RegistrantApplication.Server.Controllers
 
             return Ok();
         }
-
+        
     }
 }
-*/

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RegistrantApplication.Shared.Database.Drivers;
+namespace RegistrantApplication.Shared.Database.Accounts;
 
 public class FileDocument
 {

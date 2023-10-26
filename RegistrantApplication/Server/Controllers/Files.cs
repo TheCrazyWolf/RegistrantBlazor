@@ -1,4 +1,5 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
@@ -10,7 +11,7 @@ namespace RegistrantApplication.Server.Controllers;
 [Route("api/[controller]")]
 public class Files : BaseApiController
 {
-    public Files(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    public Files(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
     {
     }
     
@@ -43,4 +44,4 @@ public class Files : BaseApiController
         return file;
     }
     
-}*/
+}

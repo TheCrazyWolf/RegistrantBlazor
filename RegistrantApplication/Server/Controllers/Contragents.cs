@@ -28,7 +28,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Модель контрагента</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPost("Create")]
-        public IActionResult Create([FromHeader] string token, [FromBody] DtoContragent form)
+        public IActionResult Create([FromHeader] string token, [FromBody] DtoContragentCreate form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -42,13 +42,13 @@ namespace RegistrantApplication.Server.Controllers
             if (_ef.Contragents.Any(x => x.Title.ToUpper() == form.Title.ToUpper() && x.IsDeleted == false))
                 return BadRequest(ConfigMsg.ValidationElementtExist);
             
-            form.DateTimeCreated = DateTime.Now;
             var contragent = form.Adapt<Contragent>();
+            contragent.DateTimeCreated = DateTime.Now;
             
             _ef.Add(contragent);
             _ef.SaveChanges();
             
-            return Ok(contragent.Adapt<DtoContragent>());
+            return Ok(contragent.Adapt<DtoContragentView>());
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Модель контрагента с сохранением ID</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPut("Update")]
-        public IActionResult Update([FromHeader] string token, [FromBody] DtoContragent form)
+        public IActionResult Update([FromHeader] string token, [FromBody] DtoContragentCreate form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -140,7 +140,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Contragents = data.Adapt<List<DtoContragent>>(),
+                Contragents = data.Adapt<List<DtoContragentView>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
 

@@ -5,6 +5,6 @@ namespace RegistrantApplication.Shared.API.View
 {
     public class DtoDtoViewContragents : DtoViewBasePagination
     {
-        public List<DtoContragent> Contragents { get; set; } = new List<DtoContragent>();
+        public List<DtoContragentView> Contragents { get; set; } = new List<DtoContragentView>();
     }
 }

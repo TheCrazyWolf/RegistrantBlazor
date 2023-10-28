@@ -24,6 +24,7 @@ public class ConfigAdapters : IRegister
             .Map(output => output.Name, z => z.Name)
             .Map(output => output.Patronymic, z => z.Patronymic)
             .Map(output => output.IdAccountRole, z => z.AccountRole!.IdRole);
+        
 
         config.NewConfig<AccountSession, DtoAccessToken>()
             .Map(x => x.Token, z => z.Token)

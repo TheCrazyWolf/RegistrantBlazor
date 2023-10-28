@@ -25,7 +25,7 @@ public class Files : BaseApiController
     /// <param name="idDocument">ID документа который загружаем</param>
     /// <returns>Готовый документ для скачивания</returns>
     [HttpGet("Get")]
-    public async Task<IActionResult> Get([FromHeader] string token, long idDocument)
+    public async Task<IActionResult> Get([FromHeader] string token, long idFile)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -34,7 +34,7 @@ public class Files : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var document = await _ef.Files
-            .FirstOrDefaultAsync(x => x.IdFile == idDocument);
+            .FirstOrDefaultAsync(x => x.IdFile == idFile);
         
         if (document == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);

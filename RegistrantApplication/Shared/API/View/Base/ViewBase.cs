@@ -1,4 +1,4 @@
-﻿namespace RegistrantApplication.Shared.API.View;
+﻿namespace RegistrantApplication.Shared.API.View.Base;
 
 public class ViewBase : IViewAPI
 {

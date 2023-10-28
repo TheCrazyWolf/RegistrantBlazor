@@ -1,4 +1,4 @@
-﻿namespace RegistrantApplication.Shared.API.Contragents;
+﻿namespace RegistrantApplication.Shared.API.ContragentsDto;
 
 public class ContragentDto
 {

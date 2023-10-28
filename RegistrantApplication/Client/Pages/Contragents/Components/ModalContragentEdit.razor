@@ -1,9 +1,9 @@
 ﻿@inherits ModalContragentCreate
-@implements RegistrantApplication.Shared.IModal
+@implements RegistrantApplication.Shared.Client.Interfaces.IModal
 
 @using RegistrantApplication.ApiLibrary;
-@using RegistrantApplication.Shared.API.Accounts
 @using Blazored.LocalStorage
+@using RegistrantApplication.Shared.API.Security
 @using RegistrantApplication.Shared.Database.Contragents
 
 @inject RApi Api;
@@ -89,7 +89,7 @@
 
     public override async void SubmitAsync()
     {
-        var result = await Api.Contragents.Update(token: Storage.GetItem<SessionResult>("lastSession").Token, Contragent);
+        var result = await Api.Contragents.Update(token: Storage.GetItem<AccessToken>("lastSession").Token, Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

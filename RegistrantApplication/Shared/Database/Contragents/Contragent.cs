@@ -6,7 +6,7 @@ namespace RegistrantApplication.Shared.Database.Contragents
     {
         [Key]
         public long IdContragent { get; set; }
-        public required string Title { get; set; }
+        public string Title { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public bool IsDeleted { get; set; }
     }

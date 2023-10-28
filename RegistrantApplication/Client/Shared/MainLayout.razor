@@ -1,8 +1,8 @@
-﻿@using RegistrantApplication.Shared.API.Accounts
-@using System.Net
+﻿@using System.Net
 @using Newtonsoft.Json
 @using RegistrantApplication.ApiLibrary
 @using Blazored.LocalStorage
+@using RegistrantApplication.Shared.API.Security
 @inherits LayoutComponentBase
 @inject IJSRuntime jsRuntime
 
@@ -97,7 +97,7 @@
         propertySmoothShowModal = "ease-out duration-200 opacity-100 translate-y-0 sm:scale-100";
         StateHasChanged();
 
-        var lastSession = _StorageService.GetItem<SessionResult>("lastSession");
+        var lastSession = _StorageService.GetItem<AccessToken>("lastSession");
 
         if (lastSession == null)
             Navigation.NavigateTo("/security/action/login");

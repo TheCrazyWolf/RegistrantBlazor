@@ -22,12 +22,10 @@ public class Documents : BaseApiController
     /// Создать документ
     /// </summary>
     /// <param name="token">Валидный токен</param>
-    /// <param name="idAccount">ID аккаунта для которого создается документ</param>
     /// <param name="form">Содержимое документа</param>
-    /// <param name="file">Загрузка файла</param>
     /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] DocumentDto form)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DocumentDto form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -36,7 +34,7 @@ public class Documents : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAccount = await _ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
+            .FirstOrDefaultAsync(x => x.IdAccount == form.IdAcocunt);
 
         if (foundAccount == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);

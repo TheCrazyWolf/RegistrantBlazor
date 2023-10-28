@@ -1,9 +1,12 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.API.FilesDto;
+using RegistrantApplication.Shared.Database.Accounts;
 
 namespace RegistrantApplication.Server.Controllers;
 
@@ -21,8 +24,8 @@ public class Files : BaseApiController
     /// <param name="token">Валидный токен</param>
     /// <param name="idDocument">ID документа который загружаем</param>
     /// <returns>Готовый документ для скачивания</returns>
-    [HttpGet("GetFile")]
-    public async Task<IActionResult> GetFile([FromHeader] string token, long idDocument)
+    [HttpGet("Get")]
+    public async Task<IActionResult> Get([FromHeader] string token, long idDocument)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -42,6 +45,38 @@ public class Files : BaseApiController
         };
 
         return file;
+    }
+
+
+    [HttpPost("Upload")]
+    public async Task<IActionResult> Upload([FromHeader] string token, IFormFile? form)
+    {
+        if (!IsValidateToken(token, out var session))
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        if (session != null && !session.Account.AccountRole.CanCreateDocuments)
+            return StatusCode(403, ConfigMsg.NotAllowed);
+
+        if (form == null || form.Length == 0)
+            return BadRequest(ConfigMsg.ValidationTextEmpty);
+
+        FileDocument newFile;
+
+        await using (var fileStream = form.OpenReadStream())
+        {
+            newFile = new FileDocument()
+            {
+                FileName = form.FileName,
+                DataBytes = new byte[form.Length]
+            };
+
+            fileStream.ReadAsync(newFile.DataBytes, 0, (int)form.Length);
+            
+            await _ef.AddAsync(newFile);
+            await _ef.SaveChangesAsync();
+        }
+        
+        return Ok(newFile.Adapt<FileInfoDto>());
     }
     
 }

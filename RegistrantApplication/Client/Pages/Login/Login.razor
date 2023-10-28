@@ -5,7 +5,7 @@
 @using Blazored.LocalStorage
 @using Newtonsoft.Json
 @using RegistrantApplication.Client.Shared.Other
-@using RegistrantApplication.Shared.API.Accounts
+@using RegistrantApplication.Shared.API.Security
 
 @inject RApi Api;
 @inject ISyncLocalStorageService StorageService;
@@ -135,8 +135,8 @@
             return;
         }
 
-        SessionResult result = JsonConvert.DeserializeObject<SessionResult>(responce.Content);
-        StorageService.SetItem<SessionResult>("lastSession", result);
+        AccessToken result = JsonConvert.DeserializeObject<AccessToken>(responce.Content);
+        StorageService.SetItem<AccessToken>("lastSession", result);
         Navigation.NavigateTo("/",true);
     }
     

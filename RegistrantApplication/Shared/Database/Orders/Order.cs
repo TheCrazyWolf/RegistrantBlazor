@@ -20,7 +20,7 @@ namespace RegistrantApplication.Shared.Database.Orders
         public DateTime? DateTimeEndOrder { get; set; }
         public DateTime? DateTimeLeft { get; set; }
         
-        public required OrderDetail OrderDetail { get; set; }
+        public OrderDetail OrderDetail { get; set; }
         
         public bool IsDeleted { get; set; }
     }

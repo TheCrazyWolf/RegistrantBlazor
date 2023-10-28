@@ -6,7 +6,7 @@ namespace RegistrantApplication.Shared.Database.Accounts
     {
         [Key]
         public long IdDocument { get; set; }
-        public required string Title { get; set; }
+        public string Title { get; set; }
         public DocumentType DocumentType { get; set; }
         public string? Serial { get; set; } 
         public string? Number { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace RegistrantApplication.Shared;
+﻿namespace RegistrantApplication.Shared.Client.Interfaces;
 
 public interface IModal
 {

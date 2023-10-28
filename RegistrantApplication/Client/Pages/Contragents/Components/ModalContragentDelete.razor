@@ -1,8 +1,8 @@
-﻿@implements RegistrantApplication.Shared.IModal
+﻿@implements RegistrantApplication.Shared.Client.Interfaces.IModal
 
 @using RegistrantApplication.ApiLibrary;
 @using Blazored.LocalStorage
-@using RegistrantApplication.Shared.API.Accounts
+@using RegistrantApplication.Shared.API.Security
 @using RegistrantApplication.Shared.Database.Contragents
 
 @inject RApi api;
@@ -93,7 +93,7 @@
             ids.Add(item.IdContragent);
         }
 
-        var result = await api.Contragents.Delete(token: Storage.GetItem<SessionResult>("lastSession").Token, ids.ToArray());
+        var result = await api.Contragents.Delete(token: Storage.GetItem<AccessToken>("lastSession").Token, ids.ToArray());
 
         if (result.IsSuccessStatusCode)
             CloseAsync();
@@ -152,7 +152,7 @@
             ids.Add(item.IdContragent);
         }
 
-        var result = await api.Contragents.Delete(token: Storage.GetItem<SessionResult>("lastSession").Token, ids.ToArray());
+        var result = await api.Contragents.Delete(token: Storage.GetItem<AccessToken>("lastSession").Token, ids.ToArray());
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

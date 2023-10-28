@@ -3,11 +3,13 @@
 @using RegistrantApplication.Shared.API
 
 @using Newtonsoft.Json
-@using RegistrantApplication.Shared.API.Accounts
 @using Blazored.LocalStorage
 @using RegistrantApplication.Client.Pages.Accounts.Components
 @using RegistrantApplication.Shared
 @using RegistrantApplication.Shared.API.AccountsDto
+@using RegistrantApplication.Shared.API.Security
+@using RegistrantApplication.Shared.API.View
+@using RegistrantApplication.Shared.Client.Interfaces
 @using RegistrantApplication.Shared.Database.Accounts
 
 @inject RApi Api
@@ -178,7 +180,7 @@
     {
         var result = await Api.Accounts
             .Get(
-                token: Storage.GetItem<SessionResult>("lastSession").Token,
+                token: Storage.GetItem<AccessToken>("lastSession").Token,
                 search: Search,
                 page: Page,
                 showDeleted: ShowDeleted,
@@ -190,7 +192,7 @@
             Page = 0;
             result = await Api.Accounts
                 .Get(
-                    token: Storage.GetItem<SessionResult>("lastSession").Token,
+                    token: Storage.GetItem<AccessToken>("lastSession").Token,
                     search: Search,
                     page: Page,
                     showDeleted: ShowDeleted,

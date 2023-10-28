@@ -1,4 +1,7 @@
+using System.Reflection;
 using Mapster;
+using MapsterMapper;
+using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,8 +12,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<LiteContext>();
 builder.Services.AddSwaggerGen();
-builder.Configuration.AddJsonFile("appsettings.json");
 builder.Services.AddMapster();
+
+var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
+// scans the assembly and gets the IRegister, adding the registration to the TypeAdapterConfig
+typeAdapterConfig.Scan(Assembly.GetExecutingAssembly());
+// register the mapper as Singleton service for my application
+var mapperConfig = new Mapper(typeAdapterConfig);
+
+builder.Services.AddSingleton<IMapper>(mapperConfig);
+
+/*builder.Configuration.AddJsonFile("appsettings.json");*/
 //builder.WebHost.UseUrls("https://*:8080", "http://*:8080");
 
 var app = builder.Build();

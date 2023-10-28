@@ -7,7 +7,7 @@ public class AccountSession
 {
     [Key]
     public required string Token { get; set; }
-    [JsonIgnore] public Account Account { get; set; }
+    public Account Account { get; set; }
     public DateTime DateTimeSessionStarted { get; set; }
     public DateTime DateTimeSessionExpired { get; set; }
     

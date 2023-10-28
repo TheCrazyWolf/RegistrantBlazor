@@ -6,9 +6,9 @@ using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API.AccountsDto;
+using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Accounts;
 using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
-
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -84,7 +84,7 @@ namespace RegistrantApplication.Server.Controllers
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Accounts = data.Adapt<List<AccountDto>>(),
+                Accounts = data.Adapt<List<AccountViewDto>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
             
@@ -104,7 +104,7 @@ namespace RegistrantApplication.Server.Controllers
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             if (idAccount == 0)
-                return Ok(session.Account.Adapt<AccountDto>());
+                return Ok(session.Account.Adapt<AccountViewDto>());
 
             if (session != null && !session.Account.AccountRole.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
@@ -115,7 +115,7 @@ namespace RegistrantApplication.Server.Controllers
             if (currentAccount == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
-            var account = currentAccount.Adapt<AccountDto>();
+            var account = currentAccount.Adapt<AccountViewDto>();
 
             return Ok(account);
         }
@@ -127,7 +127,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Аккаунт</param>
         /// <returns></returns>
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AccountDto form)
+        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AccountUpdateDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -140,15 +140,17 @@ namespace RegistrantApplication.Server.Controllers
                 return BadRequest("Этот объект уже существует");
 
             var newAccount = form.Adapt<Account>();
+            newAccount.PasswordHash = await ModelTransfer.GetMd5(form.PasswordHash);
+            newAccount.PhoneNumber = ModelTransfer.ValidationNumber(form.PhoneNumber);
             
             await _ef.AddAsync(newAccount);
             await _ef.SaveChangesAsync();
 
-            return Ok(newAccount);
+            return Ok(newAccount.Adapt<AccountViewDto>());
         }
         
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AccountDto form)
+        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AccountUpdateDto form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -168,12 +170,17 @@ namespace RegistrantApplication.Server.Controllers
                         x.PhoneNumber == ModelTransfer.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                     return BadRequest("Этот объект уже существует");
 
-            foundAccount.Adapt(form);
+            if (!string.IsNullOrEmpty(form.PasswordHash))
+                foundAccount.PasswordHash = await ModelTransfer.GetMd5(form.PasswordHash);
 
+            if ((foundAccount.AccountRole == null) || form.IdAccountRole != foundAccount.AccountRole.IdRole)
+                foundAccount.AccountRole = await _ef.AccountRoles.FirstOrDefaultAsync(x =>x.IdRole== form.IdAccountRole);
+            
+            foundAccount.Adapt(form);
             _ef.Update(foundAccount);
             await _ef.SaveChangesAsync();
 
-            return Ok(foundAccount);
+            return Ok(foundAccount.Adapt<AccountViewDto>());
         }
         
         /// <summary>

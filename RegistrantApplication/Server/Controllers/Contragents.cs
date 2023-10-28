@@ -5,8 +5,9 @@ using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API;
-using RegistrantApplication.Shared.API.Contragents;
+using RegistrantApplication.Shared.API.ContragentsDto;
 using RegistrantApplication.Shared.API.View;
+using RegistrantApplication.Shared.API.View.Base;
 using RegistrantApplication.Shared.Database.Accounts;
 using RegistrantApplication.Shared.Database.Contragents;
 

@@ -50,11 +50,10 @@ public class Autos : BaseApiController
     /// Добавление машин за учетной записью
     /// </summary>
     /// <param name="token">Действующий токен</param>
-    /// <param name="idAccount">ID аккаунта</param>
     /// <param name="auto">Модель машины</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromHeader] long idAccount, [FromBody] AutoDto auto)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AutoDto auto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -63,16 +62,16 @@ public class Autos : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
         
         var account = await _ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == idAccount);
+            .FirstOrDefaultAsync(x => x.IdAccount == auto.IdAccount);
 
         if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        var newAuto = auto.Adapt<Account>();
-        
+        var newAuto = auto.Adapt<Auto>();
         _ef.Add(newAuto);
         await _ef.SaveChangesAsync();
-        return Ok(newAuto);
+        
+        return Ok(newAuto.Adapt<AutoDto>());
     }
     
     /// <summary>
@@ -110,7 +109,7 @@ public class Autos : BaseApiController
     /// <param name="idAutos">ID представленных в массиве</param>
     /// <returns>200 в случае успешного удаления</returns>
     [HttpDelete("Delete")]
-    public async Task<IActionResult> Delete([FromHeader] string token, [FromBody]long[] idAutos)
+    public async Task<IActionResult> Delete([FromHeader] string token, [FromBody] long[] idAutos)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);

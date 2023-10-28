@@ -16,4 +16,5 @@ public class DocumentDto
     public string? Number { get; set; }
     public DateOnly DateOfIssue { get; set; }
     public string? Authority { get; set; }
+    public long IdAcocunt { get; set; }
 }

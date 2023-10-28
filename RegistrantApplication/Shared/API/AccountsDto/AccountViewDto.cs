@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.AccountsDto;
 
-public class AccountDto
+public class AccountViewDto
 {
     public long? IdAccount { get; set; }
     private string _family { get; set; }
@@ -24,7 +24,7 @@ public class AccountDto
     public string? Patronymic
     {
         get => _patronomic?.ToUpper();
-        set => _patronomic = value.ToUpper();
+        set => _patronomic = value?.ToUpper();
     }
 
     private string? _phoneNumber;
@@ -34,5 +34,7 @@ public class AccountDto
         set => _phoneNumber = value?.ToUpper();
     }
 
+    public long? IdAccountRole { get; set; }
+    
     public bool IsEmployee { get; set; }
 }

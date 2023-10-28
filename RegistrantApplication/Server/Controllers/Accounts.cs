@@ -8,7 +8,6 @@ using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API.AccountsDto;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Accounts;
-using ModelTransfer = RegistrantApplication.Server.Controllers.BaseAPI.ModelTransfer;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -136,12 +135,12 @@ namespace RegistrantApplication.Server.Controllers
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             if (_ef.Accounts.Any(x =>
-                    x.PhoneNumber == ModelTransfer.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
+                    x.PhoneNumber == MyValidator.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                 return BadRequest("Этот объект уже существует");
 
             var newAccount = form.Adapt<Account>();
-            newAccount.PasswordHash = await ModelTransfer.GetMd5(form.PasswordHash);
-            newAccount.PhoneNumber = ModelTransfer.ValidationNumber(form.PhoneNumber);
+            newAccount.PasswordHash = await MyValidator.GetMd5(form.PasswordHash);
+            newAccount.PhoneNumber = MyValidator.ValidationNumber(form.PhoneNumber);
             
             await _ef.AddAsync(newAccount);
             await _ef.SaveChangesAsync();
@@ -165,13 +164,13 @@ namespace RegistrantApplication.Server.Controllers
             if (foundAccount == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
-            if (foundAccount.PhoneNumber != ModelTransfer.ValidationNumber(form.PhoneNumber))
+            if (foundAccount.PhoneNumber != MyValidator.ValidationNumber(form.PhoneNumber))
                 if (_ef.Accounts.Any(x =>
-                        x.PhoneNumber == ModelTransfer.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
+                        x.PhoneNumber == MyValidator.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                     return BadRequest("Этот объект уже существует");
 
             if (!string.IsNullOrEmpty(form.PasswordHash))
-                foundAccount.PasswordHash = await ModelTransfer.GetMd5(form.PasswordHash);
+                foundAccount.PasswordHash = await MyValidator.GetMd5(form.PasswordHash);
 
             if ((foundAccount.AccountRole == null) || form.IdAccountRole != foundAccount.AccountRole.IdRole)
                 foundAccount.AccountRole = await _ef.AccountRoles.FirstOrDefaultAsync(x =>x.IdRole== form.IdAccountRole);

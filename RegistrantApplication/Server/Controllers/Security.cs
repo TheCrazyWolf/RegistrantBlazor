@@ -32,8 +32,8 @@ public class Security : BaseApiController
             .Include(x=> x.AccountRole)
             .FirstOrDefaultAsync(x =>
                 x.PhoneNumber != null &&
-                x.PhoneNumber.ToUpper() == ModelTransfer.ValidationNumber(phone) &&
-                ModelTransfer.GetMd5(password).Result == x.PasswordHash &&
+                x.PhoneNumber.ToUpper() == MyValidator.ValidationNumber(phone) &&
+                MyValidator.GetMd5(password).Result == x.PasswordHash &&
                 x.IsDeleted == false);
         
         if (foundAccount == null)
@@ -44,7 +44,7 @@ public class Security : BaseApiController
         
         var session = new AccountSession()
         {
-            Token = await ModelTransfer.GetUnqueStringForToken(),
+            Token = await MyValidator.GetUnqueStringForToken(),
             Account = foundAccount,
             DateTimeSessionStarted = DateTime.Now,
             DateTimeSessionExpired = DateTime.Now.AddHours(ConfigSrv.AuthTokenLifeTimInHour),
@@ -112,13 +112,13 @@ public class Security : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session?.Account.PasswordHash != await ModelTransfer.GetMd5(oldPassword))
+        if (session?.Account.PasswordHash != await MyValidator.GetMd5(oldPassword))
             return BadRequest("Старый пароль не совпадает с новым");
         
         if(newPassword != newPassword2)
             return BadRequest("Новый пароль не повторятся правильно");
 
-        session.Account.PasswordHash = await ModelTransfer.GetMd5(newPassword);
+        session.Account.PasswordHash = await MyValidator.GetMd5(newPassword);
         _ef.Update(session.Account);
         await _ef.SaveChangesAsync();
 

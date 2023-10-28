@@ -11,10 +11,29 @@ public class DtoDocumentAccount
         get => _title.ToUpper();
         set => _title = value.ToUpper();
     }
-    public DocumentType DocumentType { get; set; }
-    public string? Serial { get; set; } 
-    public string? Number { get; set; }
+    private string? _serial;
+
+    public string? Serial
+    {
+        get => _serial!.ToUpper();
+        set => _serial = value!.ToUpper();
+    }
+
+    private string? _number;
+    public string? Number
+    {
+        get => _number!.ToUpper();
+        set => _number = value!.ToUpper();
+    }
+
     public DateOnly DateOfIssue { get; set; }
-    public string? Authority { get; set; }
-    public long IdAcocunt { get; set; }
+    private string? _authority;
+
+    public string? Authority
+    {
+        get => _authority;
+        set => _authority = value!.ToUpper();
+    }
+    public long? IdAccount { get; set; }
+    public long? IdFile { get; set; }
 }

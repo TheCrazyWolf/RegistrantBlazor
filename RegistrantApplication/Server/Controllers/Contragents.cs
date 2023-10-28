@@ -33,7 +33,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanCreateContragents)
+            if (!session!.Account.AccountRole!.CanCreateContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             if (string.IsNullOrEmpty(form.Title))
@@ -58,12 +58,12 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Модель контрагента с сохранением ID</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPut("Update")]
-        public IActionResult Update([FromHeader] string token, [FromBody] DtoContragentCreate form)
+        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoContragentCreate form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanEditContragents)
+            if (!session!.Account.AccountRole!.CanEditContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             var found = _ef.Contragents
@@ -78,7 +78,7 @@ namespace RegistrantApplication.Server.Controllers
             found.Adapt(form);
             
             _ef.Update(found);
-            _ef.SaveChanges();
+            await _ef.SaveChangesAsync();
             return Ok(found);
         }
         
@@ -96,7 +96,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanViewContragents)
+            if (!session!.Account.AccountRole!.CanViewContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             if (page < 0 )
@@ -154,12 +154,12 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="idsContragents">ID контрагентов представленны в виде массива</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpDelete("Delete")]
-        public IActionResult Delete([FromHeader] string token, [FromBody] long[] idsContragents) 
+        public async Task<IActionResult> Delete([FromHeader] string token, [FromBody] long[] idsContragents) 
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanDeleteContragents)
+            if (!session!.Account.AccountRole!.CanDeleteContragents)
                 return StatusCode(403, ConfigMsg.NotAllowed);
             
             foreach (var item in idsContragents)
@@ -169,7 +169,7 @@ namespace RegistrantApplication.Server.Controllers
                     continue;
                 found.IsDeleted = true;
                 _ef.Update(found);
-                _ef.SaveChanges();
+                await _ef.SaveChangesAsync();
             }
 
             return Ok();

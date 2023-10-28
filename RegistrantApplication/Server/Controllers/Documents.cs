@@ -30,22 +30,21 @@ public class Documents : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateDocuments)
+        if (!session!.Account.AccountRole!.CanCreateDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAccount = await _ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == form.IdAcocunt);
+            .FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
 
         if (foundAccount == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
         var document = form.Adapt<Document>();
         document.Account = foundAccount;
+        document.FileDocument = await _ef.Files.FirstOrDefaultAsync(x => x.IdFile == form.IdFile);
         
-        _ef.Add(form);
-        _ef.Update(foundAccount);
+        await _ef.AddAsync(document);
         await _ef.SaveChangesAsync();
-        
         return Ok(document.Adapt<DtoDocumentAccount>());
     }
 
@@ -62,10 +61,12 @@ public class Documents : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanEditDocuments)
+        if (!session!.Account.AccountRole!.CanEditDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundDocument = await _ef.AccountsDocuments
+            .Include(x => x.Account)
+            .Include(document => document.FileDocument!)
             .FirstOrDefaultAsync(x => x.IdDocument == form.IdDocument);
 
         if (foundDocument == null)
@@ -73,6 +74,12 @@ public class Documents : BaseApiController
 
         foundDocument.Adapt(form);
 
+        if (form.IdAccount != foundDocument.Account!.IdAccount)
+            foundDocument.Account = await _ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
+
+        if (form.IdFile != foundDocument.FileDocument!.IdFile)
+            foundDocument.FileDocument = await _ef.Files.FirstOrDefaultAsync(x => x.IdFile == form.IdFile);
+        
         _ef.Update(foundDocument);
         await _ef.SaveChangesAsync();
 
@@ -92,7 +99,7 @@ public class Documents : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanDeleteDocuments)
+        if (!session!.Account.AccountRole!.CanDeleteDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idsDocuments)
@@ -124,15 +131,16 @@ public class Documents : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanViewDocuments)
+        if (!session!.Account.AccountRole!.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var documents = _ef.AccountsDocuments
+            .Include(x=> x.FileDocument)
             .Include(x => x.Account)
             .Where(x => x.Account != null && x.Account.IdAccount == idAccount && x.IsDeleted == showDeleted)
             .ToList();
 
-        if (documents == null)
+        if (documents! == null!)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
         return Ok(documents.Adapt<List<DtoDocumentAccount>>());

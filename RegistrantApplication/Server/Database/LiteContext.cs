@@ -35,7 +35,7 @@ namespace RegistrantApplication.Server.Database
             foreach (var relationship in modelBuilder.Model.GetEntityTypes()
                          .SelectMany(e => e.GetForeignKeys()))
             {
-                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+                relationship.DeleteBehavior = DeleteBehavior.SetNull;
             }
 
             modelBuilder.Entity<AccountRole>().HasData(

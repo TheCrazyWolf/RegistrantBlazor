@@ -30,7 +30,7 @@ public class Files : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanViewDocuments)
+        if (!session!.Account.AccountRole!.CanViewDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var document = await _ef.Files
@@ -54,7 +54,7 @@ public class Files : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateDocuments)
+        if (!session!.Account.AccountRole!.CanCreateDocuments)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         if (form == null || form.Length == 0)
@@ -80,6 +80,31 @@ public class Files : BaseApiController
         }
         
         return Ok(newFile.Adapt<DtoFileInfo>());
+    }
+
+
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> Delete([FromHeader] string token, long[] idsFiles)
+    {
+        if (!IsValidateToken(token, out var session))
+            return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
+
+        if (!session!.Account.AccountRole!.CanDeleteDocuments)
+            return StatusCode(403, ConfigMsg.NotAllowed);
+
+
+        foreach (var file in idsFiles)
+        {
+            var foundFile = await _ef.Files.FirstOrDefaultAsync(x => x.IdFile == file);
+            
+            if(foundFile == null)
+                continue;
+            
+            _ef.Remove(foundFile);
+        }
+
+        await _ef.SaveChangesAsync();
+        return Ok();
     }
     
 }

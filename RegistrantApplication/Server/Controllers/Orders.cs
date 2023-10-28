@@ -1,8 +1,12 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.API;
+using RegistrantApplication.Shared.API.OrdersDto;
 using RegistrantApplication.Shared.Database.Orders;
 
 namespace RegistrantApplication.Server.Controllers;
@@ -11,7 +15,8 @@ namespace RegistrantApplication.Server.Controllers;
 [Route("api/[controller]")]
 public class Orders : BaseApiController
 {
-    public Orders(ILogger<BaseApiController> logger, LiteContext ef) : base(logger, ef)
+    
+    public Orders(ILogger<BaseApiController> logger, LiteContext ef, IMapper mapper) : base(logger, ef, mapper)
     {
     }
     
@@ -34,26 +39,31 @@ public class Orders : BaseApiController
     /// Создать новый заказ
     /// </summary>
     /// <param name="token">Валидный токен</param>
-    /// <param name="order">Заказ</param>
+    /// <param name="form">Заказ</param>
     /// <returns>Возращает 200 - если все хорощо</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] Order order)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoOrderCreate form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateOrders)
+        if (!session!.Account.AccountRole!.CanCreateOrders)
             return StatusCode(403, ConfigMsg.NotAllowed);
-        
-        order = ModelTransfer.GetModel(order);
 
-        if (order != null && order.OrderDetail == null)
-                order.OrderDetail = new OrderDetail();
+        Order order = new Order()
+        {
+            IsDeleted = false,
+            DateTimeCreatedOrder = DateTime.Now,
+            Account = await _ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == form.Account),
+            Auto = await _ef.AccountsAutos.FirstOrDefaultAsync(x => x.IdAuto == form.Auto),
+            Contragent = await _ef.Contragents.FirstOrDefaultAsync(x=> x.IdContragent == form.Contragent),
+            OrderDetail = new OrderDetail()
+        };
 
-        _ef.Add(order);
+        form.Adapt(order);
+        await _ef.AddAsync(order);
         await _ef.SaveChangesAsync();
-
-        return Ok();
+        return Ok(order.Adapt<DtoOrderCreate>());
     }
 
     /// <summary>
@@ -63,12 +73,12 @@ public class Orders : BaseApiController
     /// <param name="order">Заказ</param>
     /// <returns>Возращает 200 - если все хорощо</returns>
     [HttpPost("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] Order order)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoOrderCreate order)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanEditOrders)
+        if (!session!.Account.AccountRole!.CanEditOrders)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundOrder = await _ef.Orders
@@ -77,7 +87,8 @@ public class Orders : BaseApiController
         if (foundOrder == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        foundOrder = ModelTransfer.GetModel(order);
+        
+        
         
         return Ok();
 
@@ -95,7 +106,7 @@ public class Orders : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanDeleteOrders)
+        if (!session!.Account.AccountRole!.CanDeleteOrders)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idsOrder)
@@ -112,4 +123,5 @@ public class Orders : BaseApiController
 
         return Ok();
     }
-}*/
+    
+}

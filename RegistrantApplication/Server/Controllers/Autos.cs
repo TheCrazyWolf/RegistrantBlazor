@@ -31,7 +31,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanViewAutos)
+        if (!session!.Account.AccountRole!.CanViewAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var autoList =  _ef.AccountsAutos
@@ -39,8 +39,8 @@ public class Autos : BaseApiController
             .Where(x => x.Account != null && x.Account.IdAccount == idAccount && x.IsDeleted == showDeleted)
             .ToList();
 
-        if (autoList == null)
-            return NoContent();
+        if (autoList! == null!)
+            return NotFound(ConfigMsg.ValidationElementNotFound);
         
         return Ok(autoList.Adapt<List<DtoAuto>>());
     }
@@ -50,25 +50,26 @@ public class Autos : BaseApiController
     /// Добавление машин за учетной записью
     /// </summary>
     /// <param name="token">Действующий токен</param>
-    /// <param name="dtoAuto">Модель машины</param>
+    /// <param name="form">Модель машины</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoAuto dtoAuto)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoAuto form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanCreateAutos)
+        if (!session!.Account.AccountRole!.CanCreateAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
         
         var account = await _ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == dtoAuto.IdAccount);
+            .FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
 
         if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        var newAuto = dtoAuto.Adapt<Auto>();
-        _ef.Add(newAuto);
+        var newAuto = form.Adapt<Auto>();
+        newAuto.Account = await _ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
+        await _ef.AddAsync(newAuto);
         await _ef.SaveChangesAsync();
         
         return Ok(newAuto.Adapt<DtoAuto>());
@@ -78,28 +79,32 @@ public class Autos : BaseApiController
     /// Обновление данных о машине
     /// </summary>
     /// <param name="token">Действующий токен</param>
-    /// <param name="dtoAuto">Модель машины с сохранением прошлого ID</param>
+    /// <param name="form">Модель машины с сохранением прошлого ID</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoAuto dtoAuto)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoAuto form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanEditAutos)
+        if (!session!.Account.AccountRole!.CanEditAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAuto = await _ef.AccountsAutos
-            .FirstOrDefaultAsync(x => x.IdAuto == dtoAuto.IdAuto);
+            .Include(x=> x.Account)
+            .FirstOrDefaultAsync(x => x.IdAuto == form.IdAuto);
 
         if (foundAuto == null)
             return NoContent();
 
-        foundAuto.Adapt(dtoAuto);
+        foundAuto.Adapt(form);
+        
+        if(foundAuto.Account!.IdAccount != form.IdAccount)
+            foundAuto.Account = await _ef.Accounts.FirstOrDefaultAsync(x => x.IdAccount == form.IdAccount);
         
         _ef.Update(foundAuto);
         await _ef.SaveChangesAsync();
-        return Ok(foundAuto);
+        return Ok(foundAuto.Adapt<DtoAuto>());
     }
     
     /// <summary>
@@ -114,7 +119,7 @@ public class Autos : BaseApiController
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-        if (session != null && !session.Account.AccountRole.CanDeleteAutos)
+        if (!session!.Account.AccountRole!.CanDeleteAutos)
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         foreach (var item in idAutos)

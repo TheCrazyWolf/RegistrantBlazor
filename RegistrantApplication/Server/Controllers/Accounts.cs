@@ -8,6 +8,7 @@ using RegistrantApplication.Server.Database;
 using RegistrantApplication.Shared.API.AccountsDto;
 using RegistrantApplication.Shared.API.View;
 using RegistrantApplication.Shared.Database.Accounts;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace RegistrantApplication.Server.Controllers
 {
@@ -28,6 +29,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="showEmployee">Показать сотрудников</param>
         /// <param name="showDeleted">Показать удаленные</param>
         /// <returns></returns>
+        [SwaggerResponse(200, "Test", typeof(DtoDtoViewAccounts))]
         [HttpGet("Get")]
         public IActionResult Get([FromHeader] string token, string? search, long page, bool showEmployee,
             bool showDeleted)
@@ -35,7 +37,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanViewAccounts)
+            if (!session!.Account.AccountRole!.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             if (page < 0)
@@ -103,9 +105,9 @@ namespace RegistrantApplication.Server.Controllers
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             if (idAccount == 0)
-                return Ok(session.Account.Adapt<DtoAccountView>());
+                return Ok(session!.Account.Adapt<DtoAccountView>());
 
-            if (session != null && !session.Account.AccountRole.CanViewAccounts)
+            if (!session!.Account.AccountRole!.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             var currentAccount = _ef.Accounts
@@ -131,16 +133,16 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanCreateAccounts)
+            if (!session!.Account.AccountRole!.CanCreateAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             if (_ef.Accounts.Any(x =>
-                    x.PhoneNumber == MyValidator.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
+                    x.PhoneNumber == MyValidator.ValidationNumber(form.PhoneNumber!) && x.IsDeleted == false))
                 return BadRequest("Этот объект уже существует");
 
             var newAccount = form.Adapt<Account>();
             newAccount.PasswordHash = await MyValidator.GetMd5(form.PasswordHash);
-            newAccount.PhoneNumber = MyValidator.ValidationNumber(form.PhoneNumber);
+            newAccount.PhoneNumber = MyValidator.ValidationNumber(form.PhoneNumber!);
             
             await _ef.AddAsync(newAccount);
             await _ef.SaveChangesAsync();
@@ -154,7 +156,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (session != null && !session.Account.AccountRole.CanEditAccount)
+            if (!session!.Account.AccountRole!.CanEditAccount)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             var foundAccount = await _ef.Accounts
@@ -164,7 +166,7 @@ namespace RegistrantApplication.Server.Controllers
             if (foundAccount == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
-            if (foundAccount.PhoneNumber != MyValidator.ValidationNumber(form.PhoneNumber))
+            if (foundAccount.PhoneNumber != MyValidator.ValidationNumber(form.PhoneNumber!))
                 if (_ef.Accounts.Any(x =>
                         x.PhoneNumber == MyValidator.ValidationNumber(form.PhoneNumber) && x.IsDeleted == false))
                     return BadRequest("Этот объект уже существует");
@@ -194,7 +196,7 @@ namespace RegistrantApplication.Server.Controllers
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
-            if (!session.Account.AccountRole.CanDeleteAccounts)
+            if (!session!.Account.AccountRole!.CanDeleteAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
 
             foreach (var accountId in idsAccount)

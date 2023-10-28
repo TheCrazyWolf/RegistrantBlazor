@@ -74,7 +74,7 @@
     {
         await Task.Delay(1000);
 
-        var sessionCurrent = StorageService.GetItem<AccessToken>("lastSession");
+        var sessionCurrent = StorageService.GetItem<DtoAccessToken>("lastSession");
         if(sessionCurrent == null)
         {
             Navigation.NavigateTo("/security/action/login");

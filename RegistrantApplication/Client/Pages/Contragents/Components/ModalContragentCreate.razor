@@ -80,7 +80,7 @@
     public virtual async void SubmitAsync()
     {
         var result = await Api.Contragents
-            .Create(token: Storage.GetItem<AccessToken>("lastSession").Token, Contragent);
+            .Create(token: Storage.GetItem<DtoAccessToken>("lastSession").Token, Contragent);
 
         if (result.IsSuccessStatusCode)
             CloseAsync();

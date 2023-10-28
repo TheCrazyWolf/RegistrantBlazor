@@ -25,7 +25,7 @@ public class Documents : BaseApiController
     /// <param name="form">Содержимое документа</param>
     /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DocumentDto form)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoDocumentAccount form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -46,7 +46,7 @@ public class Documents : BaseApiController
         _ef.Update(foundAccount);
         await _ef.SaveChangesAsync();
         
-        return Ok(document.Adapt<DocumentDto>());
+        return Ok(document.Adapt<DtoDocumentAccount>());
     }
 
     
@@ -57,7 +57,7 @@ public class Documents : BaseApiController
     /// <param name="form">Содержимое документа</param>
     /// <returns>Возращает 200 - если документ успешно сохранился</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DocumentDto form)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoDocumentAccount form)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -76,7 +76,7 @@ public class Documents : BaseApiController
         _ef.Update(foundDocument);
         await _ef.SaveChangesAsync();
 
-        return Ok(foundDocument.Adapt<DocumentDto>());
+        return Ok(foundDocument.Adapt<DtoDocumentAccount>());
 
     }
 
@@ -135,7 +135,7 @@ public class Documents : BaseApiController
         if (documents == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        return Ok(documents.Adapt<List<DocumentDto>>());
+        return Ok(documents.Adapt<List<DtoDocumentAccount>>());
 
     }
     

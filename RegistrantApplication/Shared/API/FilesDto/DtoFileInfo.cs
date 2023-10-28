@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.FilesDto;
 
-public class FileInfoDto
+public class DtoFileInfo
 {
     public long IdFile { get; set; }
     public string FileName { get; set; }

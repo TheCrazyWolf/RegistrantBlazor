@@ -79,16 +79,16 @@ namespace RegistrantApplication.Server.Controllers
                 totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
 
-            ViewAccountsDto view = new ViewAccountsDto()
+            DtoDtoViewAccounts dtoDtoView = new DtoDtoViewAccounts()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Accounts = data.Adapt<List<AccountViewDto>>(),
+                Accounts = data.Adapt<List<DtoAccountView>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
             
-            return Ok(view);
+            return Ok(dtoDtoView);
         }
         
         /// <summary>
@@ -104,7 +104,7 @@ namespace RegistrantApplication.Server.Controllers
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
 
             if (idAccount == 0)
-                return Ok(session.Account.Adapt<AccountViewDto>());
+                return Ok(session.Account.Adapt<DtoAccountView>());
 
             if (session != null && !session.Account.AccountRole.CanViewAccounts)
                 return StatusCode(403, ConfigMsg.NotAllowed);
@@ -115,7 +115,7 @@ namespace RegistrantApplication.Server.Controllers
             if (currentAccount == null)
                 return NotFound(ConfigMsg.ValidationElementNotFound);
 
-            var account = currentAccount.Adapt<AccountViewDto>();
+            var account = currentAccount.Adapt<DtoAccountView>();
 
             return Ok(account);
         }
@@ -127,7 +127,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Аккаунт</param>
         /// <returns></returns>
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AccountUpdateDto form)
+        public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoAccountCreate form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -146,11 +146,11 @@ namespace RegistrantApplication.Server.Controllers
             await _ef.AddAsync(newAccount);
             await _ef.SaveChangesAsync();
 
-            return Ok(newAccount.Adapt<AccountViewDto>());
+            return Ok(newAccount.Adapt<DtoAccountView>());
         }
         
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AccountUpdateDto form)
+        public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoAccountCreate form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -180,7 +180,7 @@ namespace RegistrantApplication.Server.Controllers
             _ef.Update(foundAccount);
             await _ef.SaveChangesAsync();
 
-            return Ok(foundAccount.Adapt<AccountViewDto>());
+            return Ok(foundAccount.Adapt<DtoAccountView>());
         }
         
         /// <summary>

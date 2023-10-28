@@ -28,7 +28,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Модель контрагента</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPost("Create")]
-        public IActionResult Create([FromHeader] string token, [FromBody] ContragentDto form)
+        public IActionResult Create([FromHeader] string token, [FromBody] DtoContragent form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -48,7 +48,7 @@ namespace RegistrantApplication.Server.Controllers
             _ef.Add(contragent);
             _ef.SaveChanges();
             
-            return Ok(contragent.Adapt<ContragentDto>());
+            return Ok(contragent.Adapt<DtoContragent>());
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace RegistrantApplication.Server.Controllers
         /// <param name="form">Модель контрагента с сохранением ID</param>
         /// <returns>200 - в случае успешного создания</returns>
         [HttpPut("Update")]
-        public IActionResult Update([FromHeader] string token, [FromBody] ContragentDto form)
+        public IActionResult Update([FromHeader] string token, [FromBody] DtoContragent form)
         {
             if (!IsValidateToken(token, out var session))
                 return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -135,12 +135,12 @@ namespace RegistrantApplication.Server.Controllers
                 totalPages = totalRecords / ConfigSrv.RecordsByPage;
             }
 
-            IViewAPI view = new ViewContragents()
+            IViewAPI view = new DtoDtoViewContragents()
             {
                 TotalRecords = totalRecords,
                 TotalPages = totalPages,
                 CurrentPage = page,
-                Contragents = data.Adapt<List<ContragentDto>>(),
+                Contragents = data.Adapt<List<DtoContragent>>(),
                 MaxRecordsOnPageConst = ConfigSrv.RecordsByPage
             };
 

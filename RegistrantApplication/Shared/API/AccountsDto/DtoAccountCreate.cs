@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.AccountsDto;
 
-public class AccountUpdateDto : AccountViewDto
+public class DtoAccountCreate : DtoAccountView
 {
     public string? PasswordHash { get; set; }
 }

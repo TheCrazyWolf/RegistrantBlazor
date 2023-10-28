@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.View.Base;
 
-public class ViewBase : IViewAPI
+public class DtoViewBasePagination : IViewAPI
 {
     public long CurrentPage { get; set; }
     public long TotalPages { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.AccountsDto;
 
-public class AccountViewDto
+public class DtoAccountView
 {
     public long? IdAccount { get; set; }
     private string _family { get; set; }

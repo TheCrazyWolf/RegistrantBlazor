@@ -3,7 +3,7 @@ using RegistrantApplication.Shared.API.View.Base;
 
 namespace RegistrantApplication.Shared.API.View;
 
-public class ViewAccountsDto : ViewBase
+public class DtoDtoViewAccounts : DtoViewBasePagination
 {
-    public List<AccountViewDto> Accounts { get; set; }
+    public List<DtoAccountView> Accounts { get; set; }
 }

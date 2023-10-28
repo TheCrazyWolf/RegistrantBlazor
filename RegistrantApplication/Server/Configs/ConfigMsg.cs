@@ -13,4 +13,8 @@ public static class ConfigMsg
     public const string ValidationTextEmpty = "Обязательные поля оказались пустыми";
     public const string ValidationElementNotFound = "Элемент не найден";
     public const string ValidationElementtExist = "Элемент уже существует";
+    
+    
+    /* FILES */
+    public const string FileOverSize = "Размер файла превышает установленные рамки";
 }

@@ -135,8 +135,8 @@
             return;
         }
 
-        AccessToken result = JsonConvert.DeserializeObject<AccessToken>(responce.Content);
-        StorageService.SetItem<AccessToken>("lastSession", result);
+        DtoAccessToken result = JsonConvert.DeserializeObject<DtoAccessToken>(responce.Content);
+        StorageService.SetItem<DtoAccessToken>("lastSession", result);
         Navigation.NavigateTo("/",true);
     }
     

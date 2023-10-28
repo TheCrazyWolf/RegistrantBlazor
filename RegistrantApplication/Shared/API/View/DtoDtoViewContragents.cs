@@ -3,8 +3,8 @@ using RegistrantApplication.Shared.API.View.Base;
 
 namespace RegistrantApplication.Shared.API.View
 {
-    public class ViewContragents : ViewBase
+    public class DtoDtoViewContragents : DtoViewBasePagination
     {
-        public List<ContragentDto> Contragents { get; set; } = new List<ContragentDto>();
+        public List<DtoContragent> Contragents { get; set; } = new List<DtoContragent>();
     }
 }

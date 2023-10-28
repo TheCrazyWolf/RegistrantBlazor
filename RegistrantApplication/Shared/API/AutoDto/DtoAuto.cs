@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.AutoDto;
 
-public class AutoDto
+public class DtoAuto
 {
     public long IdAuto { get; set; }
     private string _title;

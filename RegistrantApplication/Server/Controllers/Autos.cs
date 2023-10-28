@@ -42,7 +42,7 @@ public class Autos : BaseApiController
         if (autoList == null)
             return NoContent();
         
-        return Ok(autoList.Adapt<List<AutoDto>>());
+        return Ok(autoList.Adapt<List<DtoAuto>>());
     }
 
     
@@ -50,10 +50,10 @@ public class Autos : BaseApiController
     /// Добавление машин за учетной записью
     /// </summary>
     /// <param name="token">Действующий токен</param>
-    /// <param name="auto">Модель машины</param>
+    /// <param name="dtoAuto">Модель машины</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPost("Create")]
-    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] AutoDto auto)
+    public async Task<IActionResult> Create([FromHeader] string token, [FromBody] DtoAuto dtoAuto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -62,26 +62,26 @@ public class Autos : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
         
         var account = await _ef.Accounts
-            .FirstOrDefaultAsync(x => x.IdAccount == auto.IdAccount);
+            .FirstOrDefaultAsync(x => x.IdAccount == dtoAuto.IdAccount);
 
         if (account == null)
             return NotFound(ConfigMsg.ValidationElementNotFound);
 
-        var newAuto = auto.Adapt<Auto>();
+        var newAuto = dtoAuto.Adapt<Auto>();
         _ef.Add(newAuto);
         await _ef.SaveChangesAsync();
         
-        return Ok(newAuto.Adapt<AutoDto>());
+        return Ok(newAuto.Adapt<DtoAuto>());
     }
     
     /// <summary>
     /// Обновление данных о машине
     /// </summary>
     /// <param name="token">Действующий токен</param>
-    /// <param name="auto">Модель машины с сохранением прошлого ID</param>
+    /// <param name="dtoAuto">Модель машины с сохранением прошлого ID</param>
     /// <returns>200 в случае успешного сохранения</returns>
     [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] AutoDto auto)
+    public async Task<IActionResult> Update([FromHeader] string token, [FromBody] DtoAuto dtoAuto)
     {
         if (!IsValidateToken(token, out var session))
             return Unauthorized(ConfigMsg.UnauthorizedInvalidToken);
@@ -90,12 +90,12 @@ public class Autos : BaseApiController
             return StatusCode(403, ConfigMsg.NotAllowed);
 
         var foundAuto = await _ef.AccountsAutos
-            .FirstOrDefaultAsync(x => x.IdAuto == auto.IdAuto);
+            .FirstOrDefaultAsync(x => x.IdAuto == dtoAuto.IdAuto);
 
         if (foundAuto == null)
             return NoContent();
 
-        foundAuto.Adapt(auto);
+        foundAuto.Adapt(dtoAuto);
         
         _ef.Update(foundAuto);
         await _ef.SaveChangesAsync();

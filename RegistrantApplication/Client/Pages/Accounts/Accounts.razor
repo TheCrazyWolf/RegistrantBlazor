@@ -157,7 +157,7 @@
     [SupplyParameterFromQuery]
     public bool ShowEmployee { get; set; }
 
-    private ViewAccountsDto? ViewData { get; set; } = new ViewAccountsDto();
+    private DtoDtoViewAccounts? ViewData { get; set; } = new DtoDtoViewAccounts();
 
     public List<Account>? SelectedDrivers { get; set; } = new List<Account>();
 
@@ -176,11 +176,11 @@
         StateHasChanged();
     }
 
-    private async Task<ViewAccountsDto?> DoRequestAsync()
+    private async Task<DtoDtoViewAccounts?> DoRequestAsync()
     {
         var result = await Api.Accounts
             .Get(
-                token: Storage.GetItem<AccessToken>("lastSession").Token,
+                token: Storage.GetItem<DtoAccessToken>("lastSession").Token,
                 search: Search,
                 page: Page,
                 showDeleted: ShowDeleted,
@@ -192,7 +192,7 @@
             Page = 0;
             result = await Api.Accounts
                 .Get(
-                    token: Storage.GetItem<AccessToken>("lastSession").Token,
+                    token: Storage.GetItem<DtoAccessToken>("lastSession").Token,
                     search: Search,
                     page: Page,
                     showDeleted: ShowDeleted,
@@ -200,7 +200,7 @@
                 );
         }
 
-        return result.Content == null ? new ViewAccountsDto() : JsonConvert.DeserializeObject<ViewAccountsDto>(result.Content);
+        return result.Content == null ? new DtoDtoViewAccounts() : JsonConvert.DeserializeObject<DtoDtoViewAccounts>(result.Content);
     }
 
 }

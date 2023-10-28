@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.ContragentsDto;
 
-public class ContragentDto
+public class DtoContragent
 {
     public long IdContragent { get; set; }
     private string _title;

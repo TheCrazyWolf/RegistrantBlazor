@@ -1,9 +1,11 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistrantApplication.Server.Configs;
 using RegistrantApplication.Server.Controllers.BaseAPI;
 using RegistrantApplication.Server.Database;
+using RegistrantApplication.Shared.API.Security;
 using RegistrantApplication.Shared.Database.Accounts;
 
 namespace RegistrantApplication.Server.Controllers;
@@ -51,7 +53,8 @@ public class Security : BaseApiController
 
         await _ef.AddAsync(session);
         await _ef.SaveChangesAsync();
-        return Ok(session);
+        
+        return Ok(session.Adapt<DtoAccessToken>());
     }
 
     /// <summary>

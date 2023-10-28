@@ -1,6 +1,6 @@
 ﻿namespace RegistrantApplication.Shared.API.OrdersDto;
 
-public class OrderDetailsDto
+public class DtoOrderDetails
 {
     public long IdOrderDetails { get; set; }
     public string? NumRealese { get; set; }

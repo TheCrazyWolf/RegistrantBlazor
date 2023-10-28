@@ -2,7 +2,7 @@
 
 namespace RegistrantApplication.Shared.API.AccountsDto;
 
-public class DocumentDto
+public class DtoDocumentAccount
 {
     public long IdDocument { get; set; }
     private string _title;

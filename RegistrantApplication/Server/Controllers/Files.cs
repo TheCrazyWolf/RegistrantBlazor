@@ -60,6 +60,9 @@ public class Files : BaseApiController
         if (form == null || form.Length == 0)
             return BadRequest(ConfigMsg.ValidationTextEmpty);
 
+        if(form.Length > ConfigSrv.MaxFileSize)
+            return BadRequest(ConfigMsg.FileOverSize);
+
         FileDocument newFile;
 
         await using (var fileStream = form.OpenReadStream())
@@ -70,13 +73,13 @@ public class Files : BaseApiController
                 DataBytes = new byte[form.Length]
             };
 
-            fileStream.ReadAsync(newFile.DataBytes, 0, (int)form.Length);
+            await fileStream.ReadAsync(newFile.DataBytes, 0, (int)form.Length);
             
             await _ef.AddAsync(newFile);
             await _ef.SaveChangesAsync();
         }
         
-        return Ok(newFile.Adapt<FileInfoDto>());
+        return Ok(newFile.Adapt<DtoFileInfo>());
     }
     
 }
